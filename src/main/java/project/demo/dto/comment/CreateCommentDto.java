@@ -1,7 +1,7 @@
 package project.demo.dto.comment;
 
 public record CreateCommentDto(
-        String taskId,
+        Long taskId,
         String text
 ) {
 }
