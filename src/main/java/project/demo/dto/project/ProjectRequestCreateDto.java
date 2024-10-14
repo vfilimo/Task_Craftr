@@ -3,7 +3,7 @@ package project.demo.dto.project;
 import java.time.LocalDate;
 import project.demo.model.Project;
 
-public record RequestCreateProjectDto(
+public record ProjectRequestCreateDto(
         String name,
         String description,
         LocalDate startDate,

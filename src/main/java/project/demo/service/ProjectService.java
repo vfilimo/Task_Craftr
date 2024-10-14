@@ -2,18 +2,18 @@ package project.demo.service;
 
 import java.util.List;
 import org.springframework.data.domain.Pageable;
-import project.demo.dto.project.RequestCreateProjectDto;
-import project.demo.dto.project.ResponseProjectDto;
+import project.demo.dto.project.ProjectRequestCreateDto;
+import project.demo.dto.project.ProjectResponseDto;
 import project.demo.model.User;
 
 public interface ProjectService {
-    ResponseProjectDto createNewProject(RequestCreateProjectDto createProjectDto);
+    ProjectResponseDto createNewProject(ProjectRequestCreateDto createProjectDto);
 
-    List<ResponseProjectDto> findUsersProjects(User user, Pageable pageable);
+    List<ProjectResponseDto> findUsersProjects(User user, Pageable pageable);
 
-    ResponseProjectDto findProjectDetails(User user, Long projectId);
+    ProjectResponseDto findProjectDetails(User user, Long projectId);
 
-    ResponseProjectDto updateProject(Long projectId, RequestCreateProjectDto createProjectDto);
+    ProjectResponseDto updateProject(Long projectId, ProjectRequestCreateDto createProjectDto);
 
     void deleteProject(Long projectId);
 }

@@ -3,7 +3,7 @@ package project.demo.dto.project;
 import java.time.LocalDate;
 import project.demo.model.Project;
 
-public record ResponseProjectDto(
+public record ProjectResponseDto(
         Long id,
         String name,
         String description,

@@ -16,8 +16,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import project.demo.dto.project.RequestCreateProjectDto;
-import project.demo.dto.project.ResponseProjectDto;
+import project.demo.dto.project.ProjectRequestCreateDto;
+import project.demo.dto.project.ProjectResponseDto;
 import project.demo.model.User;
 import project.demo.service.ProjectService;
 
@@ -31,14 +31,14 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping
-    public ResponseProjectDto createProject(
-            @RequestBody RequestCreateProjectDto createProjectDto) {
+    public ProjectResponseDto createProject(
+            @RequestBody ProjectRequestCreateDto createProjectDto) {
         return projectService.createNewProject(createProjectDto);
     }
 
     //has two function 1. For Manager(available all projects), 2. For User
     @GetMapping
-    public List<ResponseProjectDto> retrieveUsersProjects(
+    public List<ProjectResponseDto> retrieveUsersProjects(
             @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
                     sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
         User user = getUserFromContext();
@@ -46,15 +46,15 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
-    public ResponseProjectDto retrieveProjectDetails(@PathVariable Long id) {
+    public ProjectResponseDto retrieveProjectDetails(@PathVariable Long id) {
         User user = getUserFromContext();
         return projectService.findProjectDetails(user, id);
     }
 
     // available only for manager
     @PutMapping("/{id}")
-    public ResponseProjectDto updateProject(@PathVariable Long id,
-                                            RequestCreateProjectDto createProjectDto) {
+    public ProjectResponseDto updateProject(@PathVariable Long id,
+                                            ProjectRequestCreateDto createProjectDto) {
         return projectService.updateProject(id, createProjectDto);
 
     }
