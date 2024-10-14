@@ -35,8 +35,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public ProjectResponseDto findProjectDetails(User user, Long projectId) {
-        Project project = projectRepository.findProjectByUserIdAndProjectId(user.getId(), projectId).orElseThrow(
-                () -> new EntityNotFoundException(String.format(
+        Project project = projectRepository.findProjectByUserIdAndProjectId(user.getId(), projectId)
+                .orElseThrow(() -> new EntityNotFoundException(String.format(
                         "User with username: %s doesn't have project with id: %d",
                         user.getUsername(), projectId)));
         return projectMapper.toDto(project);
@@ -45,8 +45,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectResponseDto updateProject(Long projectId,
                                             ProjectRequestCreateDto projectRequestCreateDto) {
-        Project project = projectRepository.findById(projectId).orElseThrow(() -> new EntityNotFoundException(
-                String.format("Can't find project with id: %d", projectId)));
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("Can't find project with id: %d", projectId)));
         projectMapper.updateProject(project, projectRequestCreateDto);
         return projectMapper.toDto(projectRepository.save(project));
     }

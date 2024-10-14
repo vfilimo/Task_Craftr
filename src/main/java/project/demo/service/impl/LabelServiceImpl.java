@@ -16,6 +16,7 @@ import project.demo.service.LabelService;
 public class LabelServiceImpl implements LabelService {
     private final LabelRepository labelRepository;
     private final LabelMapper labelMapper;
+
     @Override
     public Label saveLabel(LabelSaveDto labelSaveDto) {
         Label label = labelMapper.toEntity(labelSaveDto);
@@ -30,8 +31,8 @@ public class LabelServiceImpl implements LabelService {
 
     @Override
     public Label updateLabel(Long labelId, LabelSaveDto labelSaveDto) {
-        Label label = labelRepository.findById(labelId).orElseThrow(() -> new EntityNotFoundException(
-                "Can't find label with id: " + labelId));
+        Label label = labelRepository.findById(labelId).orElseThrow(
+                () -> new EntityNotFoundException("Can't find label with id: " + labelId));
         labelMapper.updateLabel(label, labelSaveDto);
         return labelRepository.save(label);
     }

@@ -21,6 +21,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final TaskRepository taskRepository;
     private final CommentMapper commentMapper;
+
     @Override
     public CommentDto createNewComment(User user, CreateCommentDto createCommentDto) {
         Task task = taskRepository.findById(createCommentDto.taskId()).orElseThrow(

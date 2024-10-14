@@ -15,6 +15,7 @@ public interface ProjectMapper {
     Project toEntity(ProjectRequestCreateDto createProjectDto);
 
     ProjectResponseDto toDto(Project project);
+
     List<ProjectResponseDto> toDto(Page<Project> projectPage);
 
     @Mapping(target = "id", ignore = true)
