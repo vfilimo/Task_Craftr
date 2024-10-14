@@ -17,8 +17,6 @@ import project.demo.exception.AuthenticationException;
 public class JwtUtil {
     @Value("${jwt.expiration}")
     private long expiration;
-    @Value("${jwt.secret}")
-    private String secretString;
     private SecretKey secretKey;
 
     public JwtUtil(@Value("${jwt.secret}") String secretString) {
