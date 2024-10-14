@@ -1,7 +1,7 @@
 package project.demo.service;
 
-import java.awt.print.Pageable;
 import java.util.List;
+import org.springframework.data.domain.Pageable;
 import project.demo.dto.label.LabelSaveDto;
 import project.demo.model.Label;
 
