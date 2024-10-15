@@ -17,3 +17,7 @@ databaseChangeLog:
           file: db/changelog/changes/08-create-comments-table.yaml
     - include:
           file: db/changelog/changes/09-create-attachment-table.yaml
+    - include:
+        file: db/changelog/changes/10-insert-role-to-DB.yaml
+    - include:
+        file: db/changelog/changes/11-insert-admin-user.yaml
