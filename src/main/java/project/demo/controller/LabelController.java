@@ -4,11 +4,13 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,16 +25,19 @@ public class LabelController {
     private final LabelService labelService;
 
     @PostMapping
-    public Label createNewLabel(LabelSaveDto labelSaveDto) {
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public Label createNewLabel(@RequestBody LabelSaveDto labelSaveDto) {
         return labelService.saveLabel(labelSaveDto);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_USER')")
     public List<Label> getAllLabels(Pageable pageable) {
         return labelService.findAllLabels(pageable);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public Label updateLabel(@PathVariable Long id, LabelSaveDto labelSaveDto) {
         return labelService.updateLabel(id, labelSaveDto);
     }

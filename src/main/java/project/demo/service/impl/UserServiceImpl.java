@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto updateUserRole(Long userId, UserUpdateRoleDto userUpdateRoleDto) {
         User user = findUserByIdInDb(userId);
         Role role = roleRepository.findByName(userUpdateRoleDto.roleName());
-        user.getRoles().add(role);
+        user.setRoles(Set.of(role));
         return userMapper.toDto(userRepository.save(user));
     }
 
@@ -62,7 +62,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private User findUserByIdInDb(Long userId) {
-        return userRepository.findById(userId).orElseThrow(
+        return userRepository.findUserById(userId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find user with id: " + userId));
     }
 }

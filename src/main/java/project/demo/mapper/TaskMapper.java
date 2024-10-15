@@ -13,8 +13,10 @@ import project.demo.dto.task.TaskUpdateDto;
 import project.demo.model.Label;
 import project.demo.model.Task;
 
-@Mapper(config = MapperConfig.class)
+@Mapper(config = MapperConfig.class, uses = LabelMapper.class)
 public interface TaskMapper {
+    @Mapping(target = "project", ignore = true)
+    @Mapping(target = "assignee", ignore = true)
     Task toEntity(TaskCreateDto taskCreateDto);
 
     @Mapping(target = "projectName", source = "project.name")
@@ -24,14 +26,18 @@ public interface TaskMapper {
 
     List<TaskDto> toDto(Page<Task> taskPage);
 
-    @Mapping(target = "id", ignore = true)
-    void updateTask(@MappingTarget Task task, TaskUpdateDto taskUpdateDto);
-
     @AfterMapping
     default void setLabelsIds(@MappingTarget TaskDto taskDto, Task task) {
+        if (task.getLabels() == null) {
+            return;
+        }
         List<Long> listLabelIds = task.getLabels().stream()
                 .map(Label::getId)
                 .toList();
-        taskDto.labelsId().addAll(listLabelIds);
+        taskDto.setLabelsId(listLabelIds);
     }
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "labels", source = "labelsIds", qualifiedByName = "toLabelsList")
+    void updateTask(@MappingTarget Task task, TaskUpdateDto taskUpdateDto);
 }

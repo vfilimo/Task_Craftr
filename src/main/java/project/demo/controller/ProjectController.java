@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -31,6 +32,7 @@ public class ProjectController {
     private final ProjectService projectService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ProjectResponseDto createProject(
             @RequestBody ProjectRequestCreateDto createProjectDto) {
         return projectService.createNewProject(createProjectDto);
@@ -38,6 +40,7 @@ public class ProjectController {
 
     //has two function 1. For Manager(available all projects), 2. For User
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_USER')")
     public List<ProjectResponseDto> retrieveUsersProjects(
             @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
                     sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
@@ -46,6 +49,7 @@ public class ProjectController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public ProjectResponseDto retrieveProjectDetails(@PathVariable Long id) {
         User user = getUserFromContext();
         return projectService.findProjectDetails(user, id);
@@ -53,14 +57,16 @@ public class ProjectController {
 
     // available only for manager
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ProjectResponseDto updateProject(@PathVariable Long id,
-                                            ProjectRequestCreateDto createProjectDto) {
+                                            @RequestBody ProjectRequestCreateDto createProjectDto) {
         return projectService.updateProject(id, createProjectDto);
 
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
     }

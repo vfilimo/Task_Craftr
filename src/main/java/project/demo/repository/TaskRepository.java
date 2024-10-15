@@ -3,12 +3,15 @@ package project.demo.repository;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import project.demo.model.Task;
 
 public interface TaskRepository extends JpaRepository<Task, Long> {
-    Page<Task> findTaskByProjectIdAndAssigneeId(Long assigneeId,
-                                                Long projectId, Pageable pageable);
+    @EntityGraph(attributePaths = {"assignee", "project", "labels"})
+    Page<Task> findTaskByProjectIdAndAssigneeId(Long projectId,
+                                                Long assigneeId, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"assignee", "project", "labels"})
     Optional<Task> findTaskByIdAndAssigneeId(Long taskId, Long assigneeId);
 }
