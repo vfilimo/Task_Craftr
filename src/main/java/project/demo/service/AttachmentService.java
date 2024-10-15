@@ -1,10 +1,12 @@
 package project.demo.service;
 
+import java.util.List;
 import project.demo.dto.attachment.AttachmentDto;
 import project.demo.dto.attachment.AttachmentSaveDto;
+import project.demo.model.User;
 
 public interface AttachmentService {
-    AttachmentDto saveAttachment(AttachmentSaveDto attachmentSaveDto);
+    AttachmentDto saveAttachment(User assignee, AttachmentSaveDto attachmentSaveDto);
 
-    AttachmentDto findAttachmentsForTask(Long taskId);
+    List<AttachmentDto> findAttachmentsForTask(User assignee, Long taskId);
 }

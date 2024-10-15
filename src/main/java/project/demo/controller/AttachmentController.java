@@ -1,6 +1,9 @@
 package project.demo.controller;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.demo.dto.attachment.AttachmentDto;
 import project.demo.dto.attachment.AttachmentSaveDto;
+import project.demo.model.User;
 import project.demo.service.AttachmentService;
 
 @RestController
@@ -18,12 +22,19 @@ public class AttachmentController {
 
     @PostMapping
     public AttachmentDto saveAttachment(AttachmentSaveDto attachmentSaveDto) {
-        return attachmentService.saveAttachment(attachmentSaveDto);
+        User user = getUserFromContext();
+        return attachmentService.saveAttachment(user, attachmentSaveDto);
     }
 
     @GetMapping
-    public AttachmentDto getAttachmentsForTask(@RequestParam Long taskId) {
-        return attachmentService.findAttachmentsForTask(taskId);
+    public List<AttachmentDto> getAttachmentsForTask(@RequestParam Long taskId) {
+        User user = getUserFromContext();
+        return attachmentService.findAttachmentsForTask(user, taskId);
+    }
+
+    private User getUserFromContext() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return (User) authentication.getPrincipal();
     }
 }
 //      POST: /api/attachments - Upload an attachment to a task (File gets uploaded to Dropbox
