@@ -1,10 +1,15 @@
 package project.demo.service.impl;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import project.demo.dto.attachment.AttachmentDownloadDto;
 import project.demo.dto.attachment.AttachmentDto;
 import project.demo.dto.attachment.AttachmentSaveDto;
 import project.demo.exception.EntityNotFoundException;
@@ -31,7 +36,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                 assignee.getId()).orElseThrow(
                     () -> new EntityNotFoundException(String.format(
                         "User with username: %s doesn't have task with id: %d",
-                        assignee.getUsername(), attachmentSaveDto.taskId())));
+                            assignee.getUsername(), attachmentSaveDto.taskId())));
         String dropboxFiletId = fileSharingService.uploadAttachment(attachmentSaveDto.path());
         Attachment attachment = new Attachment();
         attachment.setDropboxFileId(dropboxFiletId);
@@ -43,7 +48,23 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public List<AttachmentDto> findAttachmentsForTask(User assignee, Long taskId) {
-        return null;
+    public List<AttachmentDto> findAttachmentsForTask(User assignee, Long taskId,
+                                                      Pageable pageable) {
+        Page<Attachment> attachments = attachmentRepository
+                .findAllByTaskIdAndAssigneeId(taskId, assignee.getId(), pageable);
+        return attachmentMapper.toDto(attachments);
+    }
+
+    @Override
+    public AttachmentDownloadDto downloadAttachmentById(User assignee, Long attachmentId) {
+        Attachment attachment = attachmentRepository.findAttachmentByIdAndAssigneeId(attachmentId,
+                        assignee.getId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("Can't find attachment with id: %d for user: %s",
+                                attachmentId, assignee.getUsername())));
+        Path filePath = fileSharingService.downloadFile(attachment.getDropboxFileId());
+        boolean isExists = Files.exists(filePath);
+        return new AttachmentDownloadDto(isExists ? "DOWNLOADED" : "NOT EXISTS",
+                isExists ? filePath.toString() : "NOT EXISTS");
     }
 }

@@ -1,7 +1,9 @@
 package project.demo.thirdparty.file.sharing;
 
+import java.nio.file.Path;
+
 public interface FileSharingService {
     String uploadAttachment(String uploadFilePath);
 
-    String downloadFile(String fileId);
+    Path downloadFile(String fileId);
 }

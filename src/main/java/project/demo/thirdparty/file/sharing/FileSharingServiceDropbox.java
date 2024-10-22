@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import project.demo.exception.DropboxException;
 
 @Service
 public class FileSharingServiceDropbox implements FileSharingService {
@@ -42,12 +43,12 @@ public class FileSharingServiceDropbox implements FileSharingService {
                     .uploadAndFinish(in);
             return metadata.getId();
         } catch (IOException | DbxException e) {
-            throw new RuntimeException(e);
+            throw new DropboxException("Can't upload file: " + path.getFileName(), e);
         }
     }
 
     @Override
-    public String downloadFile(String fileId) {
+    public Path downloadFile(String fileId) {
         DbxClientV2 client = createClient();
         try {
             ListFolderResult result = client.files().listFolder("");
@@ -59,11 +60,12 @@ public class FileSharingServiceDropbox implements FileSharingService {
                     .getInputStream()) {
                 Files.copy(in, createdFilePath, StandardCopyOption.REPLACE_EXISTING);
             } catch (DbxException | IOException e) {
-                throw new RuntimeException(e);
+                throw new DropboxException(
+                        String.format("Can't download file with id: %s from dropbox", fileId), e);
             }
-            return createdFilePath.toString();
+            return createdFilePath;
         } catch (DbxException e) {
-            throw new RuntimeException(e);
+            throw new DropboxException("Can't find metadata with id: " + fileId, e);
         }
     }
 
@@ -74,8 +76,7 @@ public class FileSharingServiceDropbox implements FileSharingService {
 
     private FileMetadata findMetadataById(ListFolderResult result, String id) {
         for (Metadata metadata : result.getEntries()) {
-            if (metadata instanceof FileMetadata) {
-                FileMetadata fileMetadata = (FileMetadata) metadata;
+            if (metadata instanceof FileMetadata fileMetadata) {
                 if (id.equals(fileMetadata.getId())) {
                     return fileMetadata;
                 }
