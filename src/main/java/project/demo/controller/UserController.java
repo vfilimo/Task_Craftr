@@ -30,14 +30,14 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
     public UserResponseDto getUserProfileInfo() {
         User user = getUserFromContext();
         return userService.findUserInfo(user.getId());
     }
 
     @PutMapping("/me")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
     public UserResponseDto updateUserInfo(UserUpdateRequestDto userUpdateRequestDto) {
         User user = getUserFromContext();
         return userService.updateUserInfo(user.getId(), userUpdateRequestDto);
@@ -48,7 +48,3 @@ public class UserController {
         return (User) authentication.getPrincipal();
     }
 }
-//        PUT: /users/{id}/roleName - update user roleName
-//        GET: /users/me - get my profile info
-//        PUT/PATCH: /users/me - update profile info
-

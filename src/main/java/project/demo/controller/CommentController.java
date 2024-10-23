@@ -22,15 +22,30 @@ import project.demo.service.CommentService;
 public class CommentController {
     private final CommentService commentService;
 
-    @PostMapping
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping("/manager")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public CommentDto createNewComment(@RequestBody CreateCommentDto createCommentDto) {
         User user = getUserFromContext();
         return commentService.createNewComment(user, createCommentDto);
     }
 
+    @PostMapping
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public CommentDto createNewCommentForAssignee(@RequestBody CreateCommentDto createCommentDto) {
+        User user = getUserFromContext();
+        return commentService.createNewCommentForAssignee(user, createCommentDto);
+    }
+
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_USER')")
     public List<CommentDto> getAllCommentsForTask(@RequestParam Long taskId) {
+        User user = getUserFromContext();
+        return commentService.findCommentsForAssigneeTask(user, taskId);
+    }
+
+    @GetMapping("/manager")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public List<CommentDto> getAllCommentsForAnyTask(@RequestParam Long taskId) {
         return commentService.findCommentsForTask(taskId);
     }
 
@@ -39,5 +54,3 @@ public class CommentController {
         return (User) authentication.getPrincipal();
     }
 }
-//            POST: /api/comments - Add a comment to a task
-//            GET: /api/comments?taskId={taskId} - Retrieve comments for a task

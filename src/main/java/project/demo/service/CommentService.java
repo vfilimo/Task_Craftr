@@ -9,4 +9,8 @@ public interface CommentService {
     CommentDto createNewComment(User user, CreateCommentDto createCommentDto);
 
     List<CommentDto> findCommentsForTask(Long taskId);
+
+    List<CommentDto> findCommentsForAssigneeTask(User user, Long taskId);
+
+    CommentDto createNewCommentForAssignee(User user, CreateCommentDto createCommentDto);
 }

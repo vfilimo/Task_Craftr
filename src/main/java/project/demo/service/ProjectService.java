@@ -16,4 +16,6 @@ public interface ProjectService {
     ProjectResponseDto updateProject(Long projectId, ProjectRequestCreateDto createProjectDto);
 
     void deleteProject(Long projectId);
+
+    List<ProjectResponseDto> findAllProject(Pageable pageable);
 }

@@ -56,4 +56,9 @@ public class ProjectServiceImpl implements ProjectService {
     public void deleteProject(Long projectId) {
         projectRepository.deleteById(projectId);
     }
+
+    @Override
+    public List<ProjectResponseDto> findAllProject(Pageable pageable) {
+        return projectMapper.toDto(projectRepository.findAll(pageable));
+    }
 }

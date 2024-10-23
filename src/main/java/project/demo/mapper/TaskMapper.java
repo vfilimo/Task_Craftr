@@ -7,6 +7,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.data.domain.Page;
 import project.demo.config.MapperConfig;
+import project.demo.dto.task.AssigneeTaskCreateDto;
 import project.demo.dto.task.TaskCreateDto;
 import project.demo.dto.task.TaskDto;
 import project.demo.dto.task.TaskUpdateDto;
@@ -18,6 +19,10 @@ public interface TaskMapper {
     @Mapping(target = "project", ignore = true)
     @Mapping(target = "assignee", ignore = true)
     Task toEntity(TaskCreateDto taskCreateDto);
+
+    @Mapping(target = "project", ignore = true)
+    @Mapping(target = "assignee", ignore = true)
+    Task toEntity(AssigneeTaskCreateDto assigneeTaskCreateDto);
 
     @Mapping(target = "projectName", source = "project.name")
     @Mapping(target = "assigneeUsername", source = "assignee.username")

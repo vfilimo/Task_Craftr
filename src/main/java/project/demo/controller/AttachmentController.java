@@ -4,6 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,12 +30,14 @@ public class AttachmentController {
     private final AttachmentService attachmentService;
 
     @PostMapping
+    @PreAuthorize("hasRole('ROLE_USER')")
     public AttachmentDto saveAttachment(@RequestBody AttachmentSaveDto attachmentSaveDto) {
         User user = getUserFromContext();
         return attachmentService.saveAttachment(user, attachmentSaveDto);
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ROLE_USER')")
     public List<AttachmentDto> getAttachmentsForTask(
             @RequestParam Long taskId,
             @PageableDefault(size = DEFAULT_PAGE_SIZE,
@@ -44,6 +47,7 @@ public class AttachmentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_USER')")
     public AttachmentDownloadDto downloadAttachmentById(@PathVariable Long id) {
         User user = getUserFromContext();
         return attachmentService.downloadAttachmentById(user, id);
@@ -54,7 +58,3 @@ public class AttachmentController {
         return (User) authentication.getPrincipal();
     }
 }
-//      POST: /api/attachments - Upload an attachment to a task (File gets uploaded to Dropbox
-//          and we store the Dropbox File ID in our database)
-//      GET: /api/attachments?taskId={taskId} - Retrieve attachments for a task
-//          (Get the Dropbox File ID from the database and retrieve the actual file from Dropbox)

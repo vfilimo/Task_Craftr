@@ -2,6 +2,7 @@ package project.demo.service;
 
 import java.util.List;
 import org.springframework.data.domain.Pageable;
+import project.demo.dto.task.AssigneeTaskCreateDto;
 import project.demo.dto.task.TaskCreateDto;
 import project.demo.dto.task.TaskDto;
 import project.demo.dto.task.TaskUpdateDto;
@@ -17,4 +18,12 @@ public interface TaskService {
     TaskDto updateTask(User user, Long taskId, TaskUpdateDto taskUpdateDto);
 
     void deleteTask(Long taskId);
+
+    TaskDto createNewTaskForAssignee(User user, AssigneeTaskCreateDto assigneeTaskCreateDto);
+
+    List<TaskDto> findAllTasksForProject(Long projectId, Pageable pageable);
+
+    TaskDto findAnyTaskDetails(Long taskId);
+
+    TaskDto updateTaskForManager(Long taskId, TaskUpdateDto taskUpdateDto);
 }
