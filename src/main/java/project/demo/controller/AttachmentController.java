@@ -36,6 +36,13 @@ public class AttachmentController {
         return attachmentService.saveAttachment(user, attachmentSaveDto);
     }
 
+    @PostMapping("/manager")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public AttachmentDto saveAttachmentForManager(
+            @RequestBody AttachmentSaveDto attachmentSaveDto) {
+        return attachmentService.saveAttachmentForManager(attachmentSaveDto);
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     public List<AttachmentDto> getAttachmentsForTask(
@@ -46,11 +53,27 @@ public class AttachmentController {
         return attachmentService.findAttachmentsForTask(user, taskId, pageable);
     }
 
+    @GetMapping("/manager")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public List<AttachmentDto> getAttachmentsForTaskForManager(
+            @RequestParam Long taskId,
+            @PageableDefault(size = DEFAULT_PAGE_SIZE,
+                    page = DEFAULT_PAGE, sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
+        return attachmentService.findAttachmentsForTaskForManager(taskId, pageable);
+    }
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
     public AttachmentDownloadDto downloadAttachmentById(@PathVariable Long id) {
         User user = getUserFromContext();
         return attachmentService.downloadAttachmentById(user, id);
+    }
+
+    @GetMapping("/manager/{id}")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public AttachmentDownloadDto downloadAttachmentByIdForManager(@PathVariable Long id) {
+        User user = getUserFromContext();
+        return attachmentService.downloadAttachmentByIdForManager(id);
     }
 
     private User getUserFromContext() {

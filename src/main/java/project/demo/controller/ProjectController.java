@@ -41,7 +41,7 @@ public class ProjectController {
 
     @GetMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
-    public List<ProjectResponseDto> retrieveAllProjects(
+    public List<ProjectResponseDto> retrieveManagerProjects(
             @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
             sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
         return projectService.findAllProject(pageable);
@@ -56,11 +56,17 @@ public class ProjectController {
         return projectService.findUsersProjects(user, pageable);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{projectId}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ProjectResponseDto retrieveProjectDetails(@PathVariable Long id) {
+    public ProjectResponseDto retrieveProjectDetails(@PathVariable Long projectId) {
         User user = getUserFromContext();
-        return projectService.findProjectDetails(user, id);
+        return projectService.findProjectDetails(user, projectId);
+    }
+
+    @GetMapping("/manager/{projectId}")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ProjectResponseDto retrieveManagerProjectDetails(@PathVariable Long projectId) {
+        return projectService.findAnyProjectDetails(projectId);
     }
 
     @PutMapping("/{id}")

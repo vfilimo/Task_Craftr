@@ -1,9 +1,11 @@
 package project.demo.mapper;
 
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.Mappings;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import project.demo.config.MapperConfig;
 import project.demo.dto.user.UserRegistrationRequestDto;
 import project.demo.dto.user.UserResponseDto;
@@ -21,5 +23,6 @@ public interface UserMapper {
     @Mappings({@Mapping(target = "id", ignore = true),
             @Mapping(target = "roles", ignore = true),
             @Mapping(target = "username", ignore = true)})
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateUser(@MappingTarget User user, UserUpdateRequestDto userUpdateRequestDto);
 }

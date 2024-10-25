@@ -31,12 +31,12 @@ public class AttachmentServiceImpl implements AttachmentService {
     private final AttachmentMapper attachmentMapper;
 
     @Override
-    public AttachmentDto saveAttachment(User assignee, AttachmentSaveDto attachmentSaveDto) {
+    public AttachmentDto saveAttachment(User user, AttachmentSaveDto attachmentSaveDto) {
         Task task = taskRepository.findTaskByIdAndAssigneeId(attachmentSaveDto.taskId(),
-                assignee.getId()).orElseThrow(
+                user.getId()).orElseThrow(
                     () -> new EntityNotFoundException(String.format(
                         "User with username: %s doesn't have task with id: %d",
-                            assignee.getUsername(), attachmentSaveDto.taskId())));
+                            user.getUsername(), attachmentSaveDto.taskId())));
         String dropboxFiletId = fileSharingService.uploadAttachment(attachmentSaveDto.path());
         Attachment attachment = new Attachment();
         attachment.setDropboxFileId(dropboxFiletId);
@@ -48,20 +48,53 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public List<AttachmentDto> findAttachmentsForTask(User assignee, Long taskId,
+    public AttachmentDto saveAttachmentForManager(AttachmentSaveDto attachmentSaveDto) {
+        Task task = taskRepository.findTaskById(attachmentSaveDto.taskId()).orElseThrow(
+                () -> new EntityNotFoundException("Can't find task with id: "
+                        + attachmentSaveDto.taskId()));
+        String dropboxFiletId = fileSharingService.uploadAttachment(attachmentSaveDto.path());
+        Attachment attachment = new Attachment();
+        attachment.setDropboxFileId(dropboxFiletId);
+        attachment.setTask(task);
+        attachment.setUploadTime(LocalDateTime.now());
+        String filename = Paths.get(attachmentSaveDto.path()).getFileName().toString();
+        attachment.setFilename(filename);
+        return attachmentMapper.toDto(attachmentRepository.save(attachment));
+    }
+
+    @Override
+    public List<AttachmentDto> findAttachmentsForTask(User user, Long taskId,
                                                       Pageable pageable) {
         Page<Attachment> attachments = attachmentRepository
-                .findAllByTaskIdAndAssigneeId(taskId, assignee.getId(), pageable);
+                .findAllByTaskIdAndAssigneeId(taskId, user.getId(), pageable);
         return attachmentMapper.toDto(attachments);
     }
 
     @Override
-    public AttachmentDownloadDto downloadAttachmentById(User assignee, Long attachmentId) {
+    public List<AttachmentDto> findAttachmentsForTaskForManager(Long taskId, Pageable pageable) {
+        Page<Attachment> attachments = attachmentRepository
+                .findAllByTaskId(taskId, pageable);
+        return attachmentMapper.toDto(attachments);
+    }
+
+    @Override
+    public AttachmentDownloadDto downloadAttachmentById(User user, Long attachmentId) {
         Attachment attachment = attachmentRepository.findAttachmentByIdAndAssigneeId(attachmentId,
-                        assignee.getId())
+                        user.getId())
                 .orElseThrow(() -> new EntityNotFoundException(
                         String.format("Can't find attachment with id: %d for user: %s",
-                                attachmentId, assignee.getUsername())));
+                                attachmentId, user.getUsername())));
+        Path filePath = fileSharingService.downloadFile(attachment.getDropboxFileId());
+        boolean isExists = Files.exists(filePath);
+        return new AttachmentDownloadDto(isExists ? "DOWNLOADED" : "NOT EXISTS",
+                isExists ? filePath.toString() : "NOT EXISTS");
+    }
+
+    @Override
+    public AttachmentDownloadDto downloadAttachmentByIdForManager(Long attachmentId) {
+        Attachment attachment = attachmentRepository.findById(attachmentId)
+                .orElseThrow(() -> new EntityNotFoundException(
+                        String.format("Can't find attachment with id: %d", attachmentId)));
         Path filePath = fileSharingService.downloadFile(attachment.getDropboxFileId());
         boolean isExists = Files.exists(filePath);
         return new AttachmentDownloadDto(isExists ? "DOWNLOADED" : "NOT EXISTS",

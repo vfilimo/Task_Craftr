@@ -94,7 +94,7 @@ public class TaskController {
         return taskService.updateTaskForManager(taskId, taskUpdateDto);
     }
 
-    @DeleteMapping("/{taskId}")
+    @DeleteMapping("/manager/{taskId}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public void deleteTask(@PathVariable Long taskId) {
         taskService.deleteTask(taskId);

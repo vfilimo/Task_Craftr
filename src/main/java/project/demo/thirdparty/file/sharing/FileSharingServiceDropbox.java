@@ -35,7 +35,7 @@ public class FileSharingServiceDropbox implements FileSharingService {
 
     @Override
     public String uploadAttachment(String uploadFilePath) {
-        DbxClientV2 client = createClient();
+        DbxClientV2 client = getClient();
         Path path = pathNormalizer(uploadFilePath);
         try (InputStream in = new FileInputStream(path.toString());) {
             FileMetadata metadata = client.files()
@@ -49,7 +49,7 @@ public class FileSharingServiceDropbox implements FileSharingService {
 
     @Override
     public Path downloadFile(String fileId) {
-        DbxClientV2 client = createClient();
+        DbxClientV2 client = getClient();
         try {
             ListFolderResult result = client.files().listFolder("");
             FileMetadata foundMetadata = findMetadataById(result, fileId);
@@ -69,7 +69,7 @@ public class FileSharingServiceDropbox implements FileSharingService {
         }
     }
 
-    private DbxClientV2 createClient() {
+    private DbxClientV2 getClient() {
         DbxRequestConfig config = DbxRequestConfig.newBuilder(clientIdentifier).build();
         return new DbxClientV2(config, accessToken);
     }

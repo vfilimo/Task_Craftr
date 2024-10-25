@@ -22,4 +22,7 @@ public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
     Optional<Attachment> findAttachmentByIdAndAssigneeId(
             @PathVariable("attachmentId") Long attachmentId,
             @PathVariable("assigneeId") Long assigneeId);
+
+    @EntityGraph(attributePaths = "task")
+    Page<Attachment> findAllByTaskId(Long taskId, Pageable pageable);
 }

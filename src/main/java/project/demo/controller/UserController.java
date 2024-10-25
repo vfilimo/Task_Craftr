@@ -1,5 +1,6 @@
 package project.demo.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -38,7 +39,8 @@ public class UserController {
 
     @PutMapping("/me")
     @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
-    public UserResponseDto updateUserInfo(UserUpdateRequestDto userUpdateRequestDto) {
+    public UserResponseDto updateUserInfo(
+            @RequestBody @Valid UserUpdateRequestDto userUpdateRequestDto) {
         User user = getUserFromContext();
         return userService.updateUserInfo(user.getId(), userUpdateRequestDto);
     }

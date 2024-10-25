@@ -94,9 +94,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    @Transactional
     public TaskDto updateTaskForManager(Long taskId, TaskUpdateDto taskUpdateDto) {
         Task task = findTaskById(taskId);
         taskMapper.updateTask(task, taskUpdateDto);
+        if (taskUpdateDto.assigneeId() != null
+                && !task.getAssignee().getId().equals(taskUpdateDto.assigneeId())) {
+            User newUser = userRepository.findUserById(taskUpdateDto.assigneeId()).orElseThrow(
+                    () -> new EntityNotFoundException("Can't find user with id: "
+                            + taskUpdateDto.assigneeId()));
+            task.setAssignee(newUser);
+        }
         return taskMapper.toDto(taskRepository.save(task));
     }
 
@@ -108,7 +116,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private Task findTaskById(Long taskId) {
-        return taskRepository.findById(taskId).orElseThrow(() -> new EntityNotFoundException(
+        return taskRepository.findTaskById(taskId).orElseThrow(() -> new EntityNotFoundException(
                 "Can't find task with id: " + taskId));
     }
 }

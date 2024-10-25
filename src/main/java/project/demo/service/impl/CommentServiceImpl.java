@@ -3,6 +3,8 @@ package project.demo.service.impl;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.demo.dto.comment.CommentDto;
 import project.demo.dto.comment.CreateCommentDto;
@@ -32,25 +34,25 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> findCommentsForTask(Long taskId) {
-        List<Comment> commentByTaskId = commentRepository.findCommentByTaskId(taskId);
-        return commentMapper.toDto(commentByTaskId);
-    }
-
-    @Override
-    public List<CommentDto> findCommentsForAssigneeTask(User user, Long taskId) {
-        return commentMapper.toDto(commentRepository
-                .findCommentByTaskIdAndUserId(taskId, user.getId()));
-    }
-
-    @Override
     public CommentDto createNewCommentForAssignee(User user, CreateCommentDto createCommentDto) {
         Task task = taskRepository.findTaskByIdAndAssigneeId(createCommentDto.taskId(),
                 user.getId()).orElseThrow(() -> new EntityNotFoundException(String.format(
                 "Can't find task with id: %d for user: %s", createCommentDto.taskId(),
                 user.getUsername())));
         Comment comment = initializeNewComment(task, user, createCommentDto);
-        return commentMapper.toDto(comment);
+        return commentMapper.toDto(commentRepository.save(comment));
+    }
+
+    @Override
+    public List<CommentDto> findCommentsForTask(Long taskId, Pageable pageable) {
+        return commentMapper.toDto(commentRepository.findCommentByTaskId(taskId, pageable));
+    }
+
+    @Override
+    public List<CommentDto> findCommentsForAssigneeTask(User user, Long taskId,
+                                                        Pageable pageable) {
+        return commentMapper.toDto(commentRepository
+                .findCommentByTaskIdAndUserId(taskId, user.getId(), pageable));
     }
 
     private Comment initializeNewComment(Task task, User user, CreateCommentDto createCommentDto) {

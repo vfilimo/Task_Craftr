@@ -18,7 +18,6 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
     @EntityGraph(attributePaths = {"assignee", "project", "labels"})
     Page<Task> findByProjectId(Long projectId, Pageable pageable);
 
-    @Override
     @EntityGraph(attributePaths = {"assignee", "project", "labels"})
-    Optional<Task> findById(Long taskId);
+    Optional<Task> findTaskById(Long taskId);
 }

@@ -43,6 +43,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public ProjectResponseDto findAnyProjectDetails(Long projectId) {
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new EntityNotFoundException(
+                "Can't find project with id: " + projectId));
+        return projectMapper.toDto(project);
+    }
+
+    @Override
     public ProjectResponseDto updateProject(Long projectId,
                                             ProjectRequestCreateDto projectRequestCreateDto) {
         Project project = projectRepository.findById(projectId)
