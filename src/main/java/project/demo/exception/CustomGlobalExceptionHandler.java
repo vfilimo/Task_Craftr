@@ -110,8 +110,4 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         body.put("errors", message);
         return new ResponseEntity<>(body, HttpStatus.BAD_GATEWAY);
     }
-
-
-
-
 }
