@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.demo.dto.task.AssigneeTaskCreateDto;
 import project.demo.dto.task.TaskCreateDto;
 import project.demo.dto.task.TaskDto;
 import project.demo.dto.task.TaskUpdateDto;
@@ -42,6 +43,20 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public TaskDto createNewTaskForAssignee(
+            User user, AssigneeTaskCreateDto assigneeTaskCreateDto) {
+        Project project = projectRepository.findProjectByUserIdAndProjectId(
+                        user.getId(), assigneeTaskCreateDto.projectId())
+                .orElseThrow(() -> new EntityNotFoundException(String.format(
+                        "Can't find project with id: %d for user: %s",
+                        assigneeTaskCreateDto.projectId(), user.getUsername())));
+        Task task = taskMapper.toEntity(assigneeTaskCreateDto);
+        task.setAssignee(user);
+        task.setProject(project);
+        return taskMapper.toDto(taskRepository.save(task));
+    }
+
+    @Override
     public List<TaskDto> findTasksForProject(User user, Long projectId, Pageable pageable) {
         Page<Task> taskByProjectIdAndAssigneeId = taskRepository.findTaskByProjectIdAndAssigneeId(
                 projectId, user.getId(), pageable);
@@ -67,10 +82,41 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.deleteById(taskId);
     }
 
+    @Override
+    public List<TaskDto> findAllTasksForProject(Long projectId, Pageable pageable) {
+        return taskMapper.toDto(taskRepository.findByProjectId(projectId, pageable));
+    }
+
+    @Override
+    public TaskDto findAnyTaskDetails(Long taskId) {
+        Task task = findTaskById(taskId);
+        return taskMapper.toDto(task);
+    }
+
+    @Override
+    @Transactional
+    public TaskDto updateTaskForManager(Long taskId, TaskUpdateDto taskUpdateDto) {
+        Task task = findTaskById(taskId);
+        taskMapper.updateTask(task, taskUpdateDto);
+        if (taskUpdateDto.assigneeId() != null
+                && !task.getAssignee().getId().equals(taskUpdateDto.assigneeId())) {
+            User newUser = userRepository.findUserById(taskUpdateDto.assigneeId()).orElseThrow(
+                    () -> new EntityNotFoundException("Can't find user with id: "
+                            + taskUpdateDto.assigneeId()));
+            task.setAssignee(newUser);
+        }
+        return taskMapper.toDto(taskRepository.save(task));
+    }
+
     private Task findTaskByIdAndAssigneeId(User user, Long taskId) {
         return taskRepository.findTaskByIdAndAssigneeId(taskId, user.getId()).orElseThrow(
                 () -> new EntityNotFoundException(String.format(
                         "User with username: %s doesn't have task with id: %d",
                         user.getUsername(), taskId)));
+    }
+
+    private Task findTaskById(Long taskId) {
+        return taskRepository.findTaskById(taskId).orElseThrow(() -> new EntityNotFoundException(
+                "Can't find task with id: " + taskId));
     }
 }

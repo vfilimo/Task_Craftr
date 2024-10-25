@@ -1,6 +1,11 @@
 package project.demo.dto.user;
 
-public record UserUpdateRequestDto(
+import jakarta.validation.constraints.Email;
 
+public record UserUpdateRequestDto(
+        @Email
+        String email,
+        String firstName,
+        String lastName
 ) {
 }

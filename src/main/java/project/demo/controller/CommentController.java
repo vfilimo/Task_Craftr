@@ -2,6 +2,8 @@ package project.demo.controller;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,18 +22,42 @@ import project.demo.service.CommentService;
 @RequiredArgsConstructor
 @RequestMapping("/comments")
 public class CommentController {
+    private static final int DEFAULT_PAGE = 0;
+    private static final int DEFAULT_PAGE_SIZE = 5;
+    private static final String DEFAULT_SORT_PARAMETER = "id";
     private final CommentService commentService;
 
-    @PostMapping
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PostMapping("/manager")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public CommentDto createNewComment(@RequestBody CreateCommentDto createCommentDto) {
         User user = getUserFromContext();
         return commentService.createNewComment(user, createCommentDto);
     }
 
+    @PostMapping
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public CommentDto createNewCommentForAssignee(@RequestBody CreateCommentDto createCommentDto) {
+        User user = getUserFromContext();
+        return commentService.createNewCommentForAssignee(user, createCommentDto);
+    }
+
     @GetMapping
-    public List<CommentDto> getAllCommentsForTask(@RequestParam Long taskId) {
-        return commentService.findCommentsForTask(taskId);
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public List<CommentDto> getAllCommentsForTask(
+            @RequestParam Long taskId,
+            @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
+                    sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
+        User user = getUserFromContext();
+        return commentService.findCommentsForAssigneeTask(user, taskId, pageable);
+    }
+
+    @GetMapping("/manager")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public List<CommentDto> getAllCommentsForAnyTask(
+            @RequestParam Long taskId,
+            @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
+                    sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
+        return commentService.findCommentsForTask(taskId, pageable);
     }
 
     private User getUserFromContext() {
@@ -39,5 +65,3 @@ public class CommentController {
         return (User) authentication.getPrincipal();
     }
 }
-//            POST: /api/comments - Add a comment to a task
-//            GET: /api/comments?taskId={taskId} - Retrieve comments for a task

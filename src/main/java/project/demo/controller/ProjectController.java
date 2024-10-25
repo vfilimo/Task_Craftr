@@ -33,35 +33,47 @@ public class ProjectController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @ResponseStatus(HttpStatus.CREATED)
     public ProjectResponseDto createProject(
             @RequestBody ProjectRequestCreateDto createProjectDto) {
         return projectService.createNewProject(createProjectDto);
     }
 
-    //has two function 1. For Manager(available all projects), 2. For User
+    @GetMapping("/manager")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public List<ProjectResponseDto> retrieveManagerProjects(
+            @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
+            sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
+        return projectService.findAllProject(pageable);
+    }
+
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public List<ProjectResponseDto> retrieveUsersProjects(
+    public List<ProjectResponseDto> retrieveUserProjects(
             @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
                     sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
         User user = getUserFromContext();
         return projectService.findUsersProjects(user, pageable);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{projectId}")
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ProjectResponseDto retrieveProjectDetails(@PathVariable Long id) {
+    public ProjectResponseDto retrieveProjectDetails(@PathVariable Long projectId) {
         User user = getUserFromContext();
-        return projectService.findProjectDetails(user, id);
+        return projectService.findProjectDetails(user, projectId);
     }
 
-    // available only for manager
+    @GetMapping("/manager/{projectId}")
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
+    public ProjectResponseDto retrieveManagerProjectDetails(@PathVariable Long projectId) {
+        return projectService.findAnyProjectDetails(projectId);
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public ProjectResponseDto updateProject(@PathVariable Long id,
                                             @RequestBody ProjectRequestCreateDto createProjectDto) {
         return projectService.updateProject(id, createProjectDto);
-
     }
 
     @DeleteMapping("/{id}")
@@ -76,8 +88,3 @@ public class ProjectController {
         return (User) authentication.getPrincipal();
     }
 }
-//        POST: /api/projects - Create a new project
-//        GET: /api/projects - Retrieve user's projects
-//        GET: /api/projects/{id} - Retrieve project details
-//        PUT: /api/projects/{id} - Update project
-//        DELETE: /api/projects/{id} - Delete project

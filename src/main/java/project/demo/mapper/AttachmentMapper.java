@@ -5,14 +5,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
 import project.demo.config.MapperConfig;
-import project.demo.dto.comment.CommentDto;
-import project.demo.model.Comment;
+import project.demo.dto.attachment.AttachmentDto;
+import project.demo.model.Attachment;
 
 @Mapper(config = MapperConfig.class)
-public interface CommentMapper {
+public interface AttachmentMapper {
     @Mapping(target = "taskName", source = "task.name")
-    @Mapping(target = "username", source = "user.username")
-    CommentDto toDto(Comment comment);
+    AttachmentDto toDto(Attachment attachment);
 
-    List<CommentDto> toDto(Page<Comment> commentList);
+    List<AttachmentDto> toDto(Page<Attachment> attachmentPage);
 }

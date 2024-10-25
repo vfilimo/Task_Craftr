@@ -10,6 +10,7 @@ import project.demo.dto.user.UserUpdateRequestDto;
 import project.demo.dto.user.UserUpdateRoleDto;
 import project.demo.exception.EntityNotFoundException;
 import project.demo.exception.RegistrationException;
+import project.demo.exception.UserUpdateException;
 import project.demo.mapper.UserMapper;
 import project.demo.model.Role;
 import project.demo.model.User;
@@ -42,7 +43,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto updateUserRole(Long userId, UserUpdateRoleDto userUpdateRoleDto) {
-        User user = findUserByIdInDb(userId);
+        User user = findUserById(userId);
         Role role = roleRepository.findByName(userUpdateRoleDto.roleName());
         user.setRoles(Set.of(role));
         return userMapper.toDto(userRepository.save(user));
@@ -50,18 +51,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto findUserInfo(Long userId) {
-        User user = findUserByIdInDb(userId);
+        User user = findUserById(userId);
         return userMapper.toDto(user);
     }
 
     @Override
     public UserResponseDto updateUserInfo(Long userId, UserUpdateRequestDto userUpdateRequestDto) {
-        User user = findUserByIdInDb(userId);
+        if (userRepository.findUserByEmail(userUpdateRequestDto.email()).isPresent()) {
+            throw new UserUpdateException(String.format("User with email: %s is existing",
+                    userUpdateRequestDto.email()));
+        }
+        User user = findUserById(userId);
         userMapper.updateUser(user, userUpdateRequestDto);
         return userMapper.toDto(userRepository.save(user));
     }
 
-    private User findUserByIdInDb(Long userId) {
+    private User findUserById(Long userId) {
         return userRepository.findUserById(userId).orElseThrow(
                 () -> new EntityNotFoundException("Can't find user with id: " + userId));
     }

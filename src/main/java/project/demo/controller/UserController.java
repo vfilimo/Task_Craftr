@@ -1,5 +1,6 @@
 package project.demo.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -30,15 +31,16 @@ public class UserController {
     }
 
     @GetMapping("/me")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
     public UserResponseDto getUserProfileInfo() {
         User user = getUserFromContext();
         return userService.findUserInfo(user.getId());
     }
 
     @PutMapping("/me")
-    @PreAuthorize("hasRole('ROLE_USER')")
-    public UserResponseDto updateUserInfo(UserUpdateRequestDto userUpdateRequestDto) {
+    @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
+    public UserResponseDto updateUserInfo(
+            @RequestBody @Valid UserUpdateRequestDto userUpdateRequestDto) {
         User user = getUserFromContext();
         return userService.updateUserInfo(user.getId(), userUpdateRequestDto);
     }
@@ -48,7 +50,3 @@ public class UserController {
         return (User) authentication.getPrincipal();
     }
 }
-//        PUT: /users/{id}/roleName - update user roleName
-//        GET: /users/me - get my profile info
-//        PUT/PATCH: /users/me - update profile info
-

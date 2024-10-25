@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import org.hibernate.validator.constraints.Length;
 import project.demo.model.Task;
 
-public record TaskCreateDto(
+public record AssigneeTaskCreateDto(
         @NotBlank
         @Length(max = 255)
         String name,
@@ -24,9 +24,6 @@ public record TaskCreateDto(
         LocalDate dueDate,
         @NotNull
         @Positive
-        Long projectId,
-        @NotNull
-        @Positive
-        Long assigneeId
+        Long projectId
 ) {
 }

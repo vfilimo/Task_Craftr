@@ -25,30 +25,27 @@ public class LabelController {
     private final LabelService labelService;
 
     @PostMapping
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
     public Label createNewLabel(@RequestBody LabelSaveDto labelSaveDto) {
         return labelService.saveLabel(labelSaveDto);
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
     public List<Label> getAllLabels(Pageable pageable) {
         return labelService.findAllLabels(pageable);
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
     public Label updateLabel(@PathVariable Long id, LabelSaveDto labelSaveDto) {
         return labelService.updateLabel(id, labelSaveDto);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @PreAuthorize("hasRole('ROLE_MANAGER')")
     public void deleteLabel(@PathVariable Long id) {
         labelService.deleteLabel(id);
     }
 }
-//        POST: /api/labels - Create a new label
-//        GET: /api/labels - Retrieve labels
-//        PUT: /api/labels/{id} - Update label
-//        DELETE: /api/labels/{id} - Delete label
