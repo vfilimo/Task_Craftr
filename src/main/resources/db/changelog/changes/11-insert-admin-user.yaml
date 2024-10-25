@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-users
+      author: student
+      changes:
+        - insert:
+            tableName: users
+            columns:
+              - column:
+                  name: email
+                  value: admin@gamil.com
+              - column:
+                  name: password
+                  value: $2a$10$zFoOVRbOX39EDGXC0endRuqO9hvXIaW/EuP0ZCH0waHL7bIgBZ8uu
+                  # value = password
+              - column:
+                  name: first_name
+                  value: Taras
+              - column:
+                  name: last_name
+                  value: Tarasenko
+              - column:
+                  name: username
+                  value: admin
+
+        - insert:
+            tableName: users_roles
+            columns:
+              - column:
+                  name: user_id
+                  valueComputed: "(SELECT id FROM users WHERE username = 'admin')"
+              - column:
+                  name: role_id
+                  valueComputed: "(SELECT id FROM roles WHERE name = 'ROLE_ADMIN')"
