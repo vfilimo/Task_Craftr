@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -32,6 +33,8 @@ public class Project {
     @Column(nullable = false)
     private LocalDate endDate;
     @Column(nullable = false, columnDefinition = "tinyint")
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
     private boolean isDeleted = false;
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

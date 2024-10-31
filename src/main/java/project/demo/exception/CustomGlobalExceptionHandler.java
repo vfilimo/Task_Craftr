@@ -110,4 +110,16 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         body.put("errors", message);
         return new ResponseEntity<>(body, HttpStatus.BAD_GATEWAY);
     }
+
+    @ExceptionHandler(GoogleCalendarException.class)
+    public ResponseEntity<Object> handleGoogleCalendarException(
+            GoogleCalendarException ex,
+            WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_GATEWAY);
+        String message = ex.getMessage();
+        body.put("errors", message);
+        return new ResponseEntity<>(body, HttpStatus.BAD_GATEWAY);
+    }
 }

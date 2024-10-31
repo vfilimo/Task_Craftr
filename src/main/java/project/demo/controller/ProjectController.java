@@ -1,5 +1,6 @@
 package project.demo.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +36,7 @@ public class ProjectController {
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @ResponseStatus(HttpStatus.CREATED)
     public ProjectResponseDto createProject(
-            @RequestBody ProjectRequestCreateDto createProjectDto) {
+            @RequestBody @Valid ProjectRequestCreateDto createProjectDto) {
         return projectService.createNewProject(createProjectDto);
     }
 
@@ -71,8 +72,9 @@ public class ProjectController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
-    public ProjectResponseDto updateProject(@PathVariable Long id,
-                                            @RequestBody ProjectRequestCreateDto createProjectDto) {
+    public ProjectResponseDto updateProject(
+            @PathVariable Long id,
+            @RequestBody @Valid ProjectRequestCreateDto createProjectDto) {
         return projectService.updateProject(id, createProjectDto);
     }
 

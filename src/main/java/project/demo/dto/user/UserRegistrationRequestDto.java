@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.Length;
-import project.demo.validation.FieldMatch;
+import project.demo.validation.field.match.FieldMatch;
 
 @Getter
 @Setter
