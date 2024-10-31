@@ -1,4 +1,4 @@
-package project.demo.thirdparty.file.sharing;
+package project.demo.external.file.sharing;
 
 import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;

@@ -1,5 +1,8 @@
 package project.demo.service.impl;
 
+import com.google.api.services.calendar.model.Event;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -11,6 +14,8 @@ import project.demo.dto.task.TaskCreateDto;
 import project.demo.dto.task.TaskDto;
 import project.demo.dto.task.TaskUpdateDto;
 import project.demo.exception.EntityNotFoundException;
+import project.demo.exception.GoogleCalendarException;
+import project.demo.external.google.GoogleCalendarService;
 import project.demo.mapper.TaskMapper;
 import project.demo.model.Project;
 import project.demo.model.Task;
@@ -27,6 +32,7 @@ public class TaskServiceImpl implements TaskService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final TaskMapper taskMapper;
+    private final GoogleCalendarService googleCalendarService;
 
     @Override
     public TaskDto createNewTask(TaskCreateDto createTaskDto) {
@@ -34,11 +40,17 @@ public class TaskServiceImpl implements TaskService {
         Project project = projectRepository.findById(createTaskDto.projectId()).orElseThrow(
                 () -> new EntityNotFoundException("Can't find project with id: "
                         + createTaskDto.projectId()));
-        User assignee = userRepository.findUserById(createTaskDto.assigneeId()).orElseThrow(
-                () -> new EntityNotFoundException("Can't find user with id: "
-                        + createTaskDto.projectId()));
+        User assignee = findUserInDb(createTaskDto.assigneeId());
         task.setProject(project);
         task.setAssignee(assignee);
+        Event event = googleCalendarService.createEvent(task);
+        Event insertedEvent = null;
+        try {
+            insertedEvent = googleCalendarService.insertEventInToCalendar(event);
+        } catch (GeneralSecurityException | IOException e) {
+            throw new GoogleCalendarException(e.getMessage());
+        }
+        task.setEventId(insertedEvent.getId());
         return taskMapper.toDto(taskRepository.save(task));
     }
 
@@ -53,6 +65,14 @@ public class TaskServiceImpl implements TaskService {
         Task task = taskMapper.toEntity(assigneeTaskCreateDto);
         task.setAssignee(user);
         task.setProject(project);
+        Event event = googleCalendarService.createEvent(task);
+        Event insertedEvent = null;
+        try {
+            insertedEvent = googleCalendarService.insertEventInToCalendar(event);
+        } catch (GeneralSecurityException | IOException e) {
+            throw new GoogleCalendarException(e.getMessage());
+        }
+        task.setEventId(insertedEvent.getId());
         return taskMapper.toDto(taskRepository.save(task));
     }
 
@@ -74,6 +94,31 @@ public class TaskServiceImpl implements TaskService {
     public TaskDto updateTask(User user, Long taskId, TaskUpdateDto taskUpdateDto) {
         Task task = findTaskByIdAndAssigneeId(user, taskId);
         taskMapper.updateTask(task, taskUpdateDto);
+        Event event = googleCalendarService.createEvent(task);
+        try {
+            googleCalendarService.updateEvent(event, task.getEventId());
+        } catch (IOException | GeneralSecurityException e) {
+            throw new GoogleCalendarException(e.getMessage());
+        }
+        return taskMapper.toDto(taskRepository.save(task));
+    }
+
+    @Override
+    @Transactional
+    public TaskDto updateTaskForManager(Long taskId, TaskUpdateDto taskUpdateDto) {
+        Task task = findTaskById(taskId);
+        taskMapper.updateTask(task, taskUpdateDto);
+        if (taskUpdateDto.assigneeId() != null
+                && !task.getAssignee().getId().equals(taskUpdateDto.assigneeId())) {
+            User newUser = findUserInDb(taskUpdateDto.assigneeId());
+            task.setAssignee(newUser);
+        }
+        Event event = googleCalendarService.createEvent(task);
+        try {
+            googleCalendarService.updateEvent(event, task.getEventId());
+        } catch (IOException | GeneralSecurityException e) {
+            throw new GoogleCalendarException(e.getMessage());
+        }
         return taskMapper.toDto(taskRepository.save(task));
     }
 
@@ -93,21 +138,6 @@ public class TaskServiceImpl implements TaskService {
         return taskMapper.toDto(task);
     }
 
-    @Override
-    @Transactional
-    public TaskDto updateTaskForManager(Long taskId, TaskUpdateDto taskUpdateDto) {
-        Task task = findTaskById(taskId);
-        taskMapper.updateTask(task, taskUpdateDto);
-        if (taskUpdateDto.assigneeId() != null
-                && !task.getAssignee().getId().equals(taskUpdateDto.assigneeId())) {
-            User newUser = userRepository.findUserById(taskUpdateDto.assigneeId()).orElseThrow(
-                    () -> new EntityNotFoundException("Can't find user with id: "
-                            + taskUpdateDto.assigneeId()));
-            task.setAssignee(newUser);
-        }
-        return taskMapper.toDto(taskRepository.save(task));
-    }
-
     private Task findTaskByIdAndAssigneeId(User user, Long taskId) {
         return taskRepository.findTaskByIdAndAssigneeId(taskId, user.getId()).orElseThrow(
                 () -> new EntityNotFoundException(String.format(
@@ -118,5 +148,10 @@ public class TaskServiceImpl implements TaskService {
     private Task findTaskById(Long taskId) {
         return taskRepository.findTaskById(taskId).orElseThrow(() -> new EntityNotFoundException(
                 "Can't find task with id: " + taskId));
+    }
+
+    private User findUserInDb(Long id) {
+        return userRepository.findUserById(id).orElseThrow(
+                () -> new EntityNotFoundException("Can't find user with id: " + id));
     }
 }

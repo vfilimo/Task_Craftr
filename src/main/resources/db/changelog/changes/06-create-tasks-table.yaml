@@ -29,6 +29,9 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: event_id
+                  type: varchar(255)
+              - column:
                   name: status
                   type: varchar(50)
                   constraints:

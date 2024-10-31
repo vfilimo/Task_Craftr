@@ -13,6 +13,7 @@ import project.demo.dto.attachment.AttachmentDownloadDto;
 import project.demo.dto.attachment.AttachmentDto;
 import project.demo.dto.attachment.AttachmentSaveDto;
 import project.demo.exception.EntityNotFoundException;
+import project.demo.external.file.sharing.FileSharingService;
 import project.demo.mapper.AttachmentMapper;
 import project.demo.model.Attachment;
 import project.demo.model.Task;
@@ -20,7 +21,6 @@ import project.demo.model.User;
 import project.demo.repository.AttachmentRepository;
 import project.demo.repository.TaskRepository;
 import project.demo.service.AttachmentService;
-import project.demo.thirdparty.file.sharing.FileSharingService;
 
 @Service
 @RequiredArgsConstructor

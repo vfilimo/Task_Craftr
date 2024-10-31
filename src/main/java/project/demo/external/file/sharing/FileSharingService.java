@@ -1,4 +1,4 @@
-package project.demo.thirdparty.file.sharing;
+package project.demo.external.file.sharing;
 
 import java.nio.file.Path;
 
