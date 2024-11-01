@@ -122,4 +122,15 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         body.put("errors", message);
         return new ResponseEntity<>(body, HttpStatus.BAD_GATEWAY);
     }
+
+    @ExceptionHandler(TaskDueDateException.class)
+    public ResponseEntity<Object> handleTaskDueDateException(
+            TaskDueDateException ex,
+            WebRequest request) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.BAD_REQUEST);
+        body.put("errors", ex.getMessage());
+        return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
+    }
 }

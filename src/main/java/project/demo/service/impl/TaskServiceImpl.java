@@ -15,6 +15,7 @@ import project.demo.dto.task.TaskDto;
 import project.demo.dto.task.TaskUpdateDto;
 import project.demo.exception.EntityNotFoundException;
 import project.demo.exception.GoogleCalendarException;
+import project.demo.exception.TaskDueDateException;
 import project.demo.external.google.GoogleCalendarService;
 import project.demo.mapper.TaskMapper;
 import project.demo.model.Project;
@@ -40,6 +41,7 @@ public class TaskServiceImpl implements TaskService {
         Project project = projectRepository.findById(createTaskDto.projectId()).orElseThrow(
                 () -> new EntityNotFoundException("Can't find project with id: "
                         + createTaskDto.projectId()));
+        dateCheck(project, task);
         User assignee = findUserInDb(createTaskDto.assigneeId());
         task.setProject(project);
         task.setAssignee(assignee);
@@ -63,6 +65,7 @@ public class TaskServiceImpl implements TaskService {
                         "Can't find project with id: %d for user: %s",
                         assigneeTaskCreateDto.projectId(), user.getUsername())));
         Task task = taskMapper.toEntity(assigneeTaskCreateDto);
+        dateCheck(project, task);
         task.setAssignee(user);
         task.setProject(project);
         Event event = googleCalendarService.createEvent(task);
@@ -94,6 +97,7 @@ public class TaskServiceImpl implements TaskService {
     public TaskDto updateTask(User user, Long taskId, TaskUpdateDto taskUpdateDto) {
         Task task = findTaskByIdAndAssigneeId(user, taskId);
         taskMapper.updateTask(task, taskUpdateDto);
+        dateCheck(task.getProject(), task);
         Event event = googleCalendarService.createEvent(task);
         try {
             googleCalendarService.updateEvent(event, task.getEventId());
@@ -108,6 +112,7 @@ public class TaskServiceImpl implements TaskService {
     public TaskDto updateTaskForManager(Long taskId, TaskUpdateDto taskUpdateDto) {
         Task task = findTaskById(taskId);
         taskMapper.updateTask(task, taskUpdateDto);
+        dateCheck(task.getProject(), task);
         if (taskUpdateDto.assigneeId() != null
                 && !task.getAssignee().getId().equals(taskUpdateDto.assigneeId())) {
             User newUser = findUserInDb(taskUpdateDto.assigneeId());
@@ -153,5 +158,11 @@ public class TaskServiceImpl implements TaskService {
     private User findUserInDb(Long id) {
         return userRepository.findUserById(id).orElseThrow(
                 () -> new EntityNotFoundException("Can't find user with id: " + id));
+    }
+
+    private void dateCheck(Project project, Task task) {
+        if (project.getEndDate().isAfter(task.getDueDate())) {
+            throw new TaskDueDateException("The due date can't be after that the project end date");
+        }
     }
 }
