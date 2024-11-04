@@ -1,5 +1,7 @@
 package project.demo.service.impl;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -45,7 +47,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto updateUserRole(Long userId, UserUpdateRoleDto userUpdateRoleDto) {
         User user = findUserById(userId);
         Role role = roleRepository.findByName(userUpdateRoleDto.roleName());
-        user.setRoles(Set.of(role));
+        user.setRoles(new HashSet<>(Collections.singleton(role)));
         return userMapper.toDto(userRepository.save(user));
     }
 

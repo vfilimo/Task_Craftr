@@ -1,8 +1,6 @@
 package project.demo.service.impl;
 
 import com.google.api.services.calendar.model.Event;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -14,7 +12,6 @@ import project.demo.dto.task.TaskCreateDto;
 import project.demo.dto.task.TaskDto;
 import project.demo.dto.task.TaskUpdateDto;
 import project.demo.exception.EntityNotFoundException;
-import project.demo.exception.GoogleCalendarException;
 import project.demo.exception.TaskDueDateException;
 import project.demo.external.google.GoogleCalendarService;
 import project.demo.mapper.TaskMapper;
@@ -46,12 +43,8 @@ public class TaskServiceImpl implements TaskService {
         task.setProject(project);
         task.setAssignee(assignee);
         Event event = googleCalendarService.createEvent(task);
-        Event insertedEvent = null;
-        try {
-            insertedEvent = googleCalendarService.insertEventInToCalendar(event);
-        } catch (GeneralSecurityException | IOException e) {
-            throw new GoogleCalendarException(e.getMessage());
-        }
+
+        Event insertedEvent = googleCalendarService.insertEventInToCalendar(event);
         task.setEventId(insertedEvent.getId());
         return taskMapper.toDto(taskRepository.save(task));
     }
@@ -68,14 +61,11 @@ public class TaskServiceImpl implements TaskService {
         dateCheck(project, task);
         task.setAssignee(user);
         task.setProject(project);
+
         Event event = googleCalendarService.createEvent(task);
-        Event insertedEvent = null;
-        try {
-            insertedEvent = googleCalendarService.insertEventInToCalendar(event);
-        } catch (GeneralSecurityException | IOException e) {
-            throw new GoogleCalendarException(e.getMessage());
-        }
+        Event insertedEvent = googleCalendarService.insertEventInToCalendar(event);
         task.setEventId(insertedEvent.getId());
+
         return taskMapper.toDto(taskRepository.save(task));
     }
 
@@ -98,12 +88,10 @@ public class TaskServiceImpl implements TaskService {
         Task task = findTaskByIdAndAssigneeId(user, taskId);
         taskMapper.updateTask(task, taskUpdateDto);
         dateCheck(task.getProject(), task);
+
         Event event = googleCalendarService.createEvent(task);
-        try {
-            googleCalendarService.updateEvent(event, task.getEventId());
-        } catch (IOException | GeneralSecurityException e) {
-            throw new GoogleCalendarException(e.getMessage());
-        }
+        googleCalendarService.updateEvent(event, task.getEventId());
+
         return taskMapper.toDto(taskRepository.save(task));
     }
 
@@ -118,12 +106,10 @@ public class TaskServiceImpl implements TaskService {
             User newUser = findUserInDb(taskUpdateDto.assigneeId());
             task.setAssignee(newUser);
         }
+
         Event event = googleCalendarService.createEvent(task);
-        try {
-            googleCalendarService.updateEvent(event, task.getEventId());
-        } catch (IOException | GeneralSecurityException e) {
-            throw new GoogleCalendarException(e.getMessage());
-        }
+        googleCalendarService.updateEvent(event, task.getEventId());
+
         return taskMapper.toDto(taskRepository.save(task));
     }
 
@@ -161,8 +147,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     private void dateCheck(Project project, Task task) {
-        if (project.getEndDate().isAfter(task.getDueDate())) {
-            throw new TaskDueDateException("The due date can't be after that the project end date");
+        if (task.getDueDate().isAfter(project.getEndDate())) {
+            throw new TaskDueDateException("The due date must be before project end date");
+        } else if (task.getDueDate().isBefore(project.getStartDate())) {
+            throw new TaskDueDateException("The due date must be after project start date");
         }
     }
 }

@@ -1,9 +1,11 @@
 package project.demo.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import project.demo.dto.attachment.AttachmentDownloadDto;
 import project.demo.dto.attachment.AttachmentDto;
@@ -31,15 +34,17 @@ public class AttachmentController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public AttachmentDto saveAttachment(@RequestBody AttachmentSaveDto attachmentSaveDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public AttachmentDto saveAttachment(@RequestBody @Valid AttachmentSaveDto attachmentSaveDto) {
         User user = getUserFromContext();
         return attachmentService.saveAttachment(user, attachmentSaveDto);
     }
 
     @PostMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @ResponseStatus(HttpStatus.CREATED)
     public AttachmentDto saveAttachmentForManager(
-            @RequestBody AttachmentSaveDto attachmentSaveDto) {
+            @RequestBody @Valid AttachmentSaveDto attachmentSaveDto) {
         return attachmentService.saveAttachmentForManager(attachmentSaveDto);
     }
 
@@ -72,7 +77,6 @@ public class AttachmentController {
     @GetMapping("/manager/{id}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     public AttachmentDownloadDto downloadAttachmentByIdForManager(@PathVariable Long id) {
-        User user = getUserFromContext();
         return attachmentService.downloadAttachmentByIdForManager(id);
     }
 

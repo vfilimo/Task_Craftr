@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import project.demo.exception.GoogleCalendarException;
 import project.demo.model.Task;
 
 @Service
@@ -28,15 +29,6 @@ public class GoogleCalendarService {
     private static final String SEND_UPDATES_OPTION = "all";
     @Value("${google.calendar-id}")
     private String calendarId;
-
-    private Calendar getCalendar() throws GeneralSecurityException, IOException {
-        final NetHttpTransport netHttpTransport = GoogleNetHttpTransport.newTrustedTransport();
-
-        return new Calendar.Builder(netHttpTransport, JSON_FACTORY,
-                GoogleAuthorization.getCredentials(netHttpTransport))
-                .setApplicationName(APPLICATION_NAME)
-                .build();
-    }
 
     public Event createEvent(Task task) {
         Event event = new Event()
@@ -65,28 +57,39 @@ public class GoogleCalendarService {
         return event;
     }
 
-    public Event insertEventInToCalendar(Event event)
-            throws GeneralSecurityException, IOException {
-        return getCalendar()
-                .events()
-                .insert(calendarId, event)
-                .setSendUpdates(SEND_UPDATES_OPTION)
-                .execute();
+    private Calendar getGoogleCalendar() throws GeneralSecurityException, IOException {
+        final NetHttpTransport netHttpTransport = GoogleNetHttpTransport.newTrustedTransport();
+        return new Calendar.Builder(netHttpTransport, GsonFactory.getDefaultInstance(),
+                GoogleAuthorization.getCredentials(netHttpTransport))
+                .setApplicationName("TaskCrafter")
+                .build();
     }
 
-    public Event updateEvent(Event newEvent, String eventId)
-            throws IOException, GeneralSecurityException {
-        return getCalendar()
-                .events()
-                .update(calendarId, eventId, newEvent)
-                .setSendUpdates(SEND_UPDATES_OPTION)
-                .execute();
+    public Event insertEventInToCalendar(Event event) {
+        try {
+            return getGoogleCalendar().events()
+                    .insert(calendarId, event)
+                    .setSendUpdates(SEND_UPDATES_OPTION)
+                    .execute();
+        } catch (IOException | GeneralSecurityException e) {
+            throw new GoogleCalendarException(e.getMessage());
+        }
+    }
+
+    public void updateEvent(Event newEvent, String eventId) {
+        try {
+            getGoogleCalendar().events()
+                    .update(calendarId, eventId, newEvent)
+                    .setSendUpdates(SEND_UPDATES_OPTION)
+                    .execute();
+        } catch (IOException | GeneralSecurityException e) {
+            throw new GoogleCalendarException(e.getMessage());
+        }
     }
 
     public Event getEventFromCalendar(String calendarId, String eventId)
             throws GeneralSecurityException, IOException {
-        return getCalendar()
-                .events()
+        return getGoogleCalendar().events()
                 .get(calendarId, eventId)
                 .execute();
     }

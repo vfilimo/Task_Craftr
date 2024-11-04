@@ -1,9 +1,11 @@
 package project.demo.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import project.demo.dto.comment.CommentDto;
 import project.demo.dto.comment.CreateCommentDto;
@@ -29,14 +32,17 @@ public class CommentController {
 
     @PostMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
-    public CommentDto createNewComment(@RequestBody CreateCommentDto createCommentDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto createNewComment(@RequestBody @Valid CreateCommentDto createCommentDto) {
         User user = getUserFromContext();
         return commentService.createNewComment(user, createCommentDto);
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    public CommentDto createNewCommentForAssignee(@RequestBody CreateCommentDto createCommentDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto createNewCommentForAssignee(
+            @RequestBody @Valid CreateCommentDto createCommentDto) {
         User user = getUserFromContext();
         return commentService.createNewCommentForAssignee(user, createCommentDto);
     }

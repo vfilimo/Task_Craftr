@@ -1,5 +1,6 @@
 package project.demo.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -26,7 +27,8 @@ public class LabelController {
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
-    public Label createNewLabel(@RequestBody LabelSaveDto labelSaveDto) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public Label createNewLabel(@RequestBody @Valid LabelSaveDto labelSaveDto) {
         return labelService.saveLabel(labelSaveDto);
     }
 
@@ -38,7 +40,8 @@ public class LabelController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
-    public Label updateLabel(@PathVariable Long id, LabelSaveDto labelSaveDto) {
+    public Label updateLabel(@PathVariable Long id,
+                             @RequestBody @Valid LabelSaveDto labelSaveDto) {
         return labelService.updateLabel(id, labelSaveDto);
     }
 

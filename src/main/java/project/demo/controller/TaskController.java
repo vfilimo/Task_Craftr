@@ -5,6 +5,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import project.demo.dto.task.AssigneeTaskCreateDto;
 import project.demo.dto.task.TaskCreateDto;
@@ -35,12 +37,14 @@ public class TaskController {
 
     @PostMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @ResponseStatus(HttpStatus.CREATED)
     public TaskDto createNewTaskForManager(@RequestBody @Valid TaskCreateDto createTaskDto) {
         return taskService.createNewTask(createTaskDto);
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
+    @ResponseStatus(HttpStatus.CREATED)
     public TaskDto createNewTaskForAssignee(
             @RequestBody @Valid AssigneeTaskCreateDto assigneeTaskCreateDto) {
         User user = getUserFromContext();
@@ -63,7 +67,6 @@ public class TaskController {
             @RequestParam Long projectId,
             @PageableDefault(size = DEFAULT_PAGE_SIZE,
                     page = DEFAULT_PAGE, sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
-        User user = getUserFromContext();
         return taskService.findAllTasksForProject(projectId, pageable);
     }
 
@@ -96,6 +99,7 @@ public class TaskController {
 
     @DeleteMapping("/manager/{taskId}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTask(@PathVariable Long taskId) {
         taskService.deleteTask(taskId);
     }
