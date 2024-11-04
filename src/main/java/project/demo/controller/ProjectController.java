@@ -1,5 +1,7 @@
 package project.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import project.demo.service.ProjectService;
 @RestController
 @RequestMapping("/projects")
 @RequiredArgsConstructor
+@Tag(name = "Project management.", description = "Endpoints for project management.")
 public class ProjectController {
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_PAGE_SIZE = 5;
@@ -35,6 +38,8 @@ public class ProjectController {
     @PostMapping
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create new project for role manager.",
+            description = "Create new project.")
     public ProjectResponseDto createProject(
             @RequestBody @Valid ProjectRequestCreateDto createProjectDto) {
         return projectService.createNewProject(createProjectDto);
@@ -42,6 +47,8 @@ public class ProjectController {
 
     @GetMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Find all projects for role manager.",
+            description = "Find all projects.")
     public List<ProjectResponseDto> retrieveManagerProjects(
             @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
             sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
@@ -50,6 +57,8 @@ public class ProjectController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
+    @Operation(summary = "Find all projects for role user.",
+            description = "Find all projects which has task where login user is assignee.")
     public List<ProjectResponseDto> retrieveUserProjects(
             @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
                     sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
@@ -59,6 +68,8 @@ public class ProjectController {
 
     @GetMapping("/{projectId}")
     @PreAuthorize("hasRole('ROLE_USER')")
+    @Operation(summary = "Find project by id for role user.",
+            description = "Find project by id which has task where login user is assignee.")
     public ProjectResponseDto retrieveProjectDetails(@PathVariable Long projectId) {
         User user = getUserFromContext();
         return projectService.findProjectDetails(user, projectId);
@@ -66,12 +77,16 @@ public class ProjectController {
 
     @GetMapping("/manager/{projectId}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Find project by id for role manager.",
+            description = "Find any project by id.")
     public ProjectResponseDto retrieveManagerProjectDetails(@PathVariable Long projectId) {
         return projectService.findAnyProjectDetails(projectId);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Update project by id for role manager.",
+            description = "Update any project by id.")
     public ProjectResponseDto updateProject(
             @PathVariable Long id,
             @RequestBody @Valid ProjectRequestCreateDto createProjectDto) {
@@ -81,6 +96,8 @@ public class ProjectController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Operation(summary = "Delete project by id for role admin.",
+            description = "Delete any project by id.")
     public void deleteProject(@PathVariable Long id) {
         projectService.deleteProject(id);
     }

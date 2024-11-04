@@ -1,5 +1,7 @@
 package project.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ import project.demo.service.CommentService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/comments")
+@Tag(name = "Comment management.", description = "Endpoints for comment management.")
 public class CommentController {
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_PAGE_SIZE = 5;
@@ -33,6 +36,8 @@ public class CommentController {
     @PostMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Save new comment for role manager.",
+            description = "Save new comment for any task.")
     public CommentDto createNewComment(@RequestBody @Valid CreateCommentDto createCommentDto) {
         User user = getUserFromContext();
         return commentService.createNewComment(user, createCommentDto);
@@ -41,6 +46,8 @@ public class CommentController {
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Save new comment for role user.",
+            description = "Save new comment for task where login user is assignee.")
     public CommentDto createNewCommentForAssignee(
             @RequestBody @Valid CreateCommentDto createCommentDto) {
         User user = getUserFromContext();
@@ -49,6 +56,8 @@ public class CommentController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
+    @Operation(summary = "Find all comments for role user.",
+            description = "Find all comments for task where login user is assignee.")
     public List<CommentDto> getAllCommentsForTask(
             @RequestParam Long taskId,
             @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
@@ -59,6 +68,8 @@ public class CommentController {
 
     @GetMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Find all comments for role manager.",
+            description = "Find all comments for any task.")
     public List<CommentDto> getAllCommentsForAnyTask(
             @RequestParam Long taskId,
             @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,

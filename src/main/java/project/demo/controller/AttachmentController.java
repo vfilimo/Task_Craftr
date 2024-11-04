@@ -1,5 +1,7 @@
 package project.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ import project.demo.service.AttachmentService;
 @RestController
 @RequestMapping("/attachments")
 @RequiredArgsConstructor
+@Tag(name = "Attachment management.", description = "Endpoints for attachment management.")
 public class AttachmentController {
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_PAGE_SIZE = 5;
@@ -35,6 +38,8 @@ public class AttachmentController {
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Save new attachment for role user.",
+            description = "Save new attachment for task where login user is assignee.")
     public AttachmentDto saveAttachment(@RequestBody @Valid AttachmentSaveDto attachmentSaveDto) {
         User user = getUserFromContext();
         return attachmentService.saveAttachment(user, attachmentSaveDto);
@@ -43,6 +48,8 @@ public class AttachmentController {
     @PostMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Save new attachment for role manager.",
+            description = "Save new attachment for any task.")
     public AttachmentDto saveAttachmentForManager(
             @RequestBody @Valid AttachmentSaveDto attachmentSaveDto) {
         return attachmentService.saveAttachmentForManager(attachmentSaveDto);
@@ -50,6 +57,8 @@ public class AttachmentController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
+    @Operation(summary = "Get all attachments for role user.",
+            description = "Get all attachments for task where login user is assignee.")
     public List<AttachmentDto> getAttachmentsForTask(
             @RequestParam Long taskId,
             @PageableDefault(size = DEFAULT_PAGE_SIZE,
@@ -60,6 +69,8 @@ public class AttachmentController {
 
     @GetMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Get all attachments for role manager.",
+            description = "Get all attachments for any task.")
     public List<AttachmentDto> getAttachmentsForTaskForManager(
             @RequestParam Long taskId,
             @PageableDefault(size = DEFAULT_PAGE_SIZE,
@@ -69,6 +80,8 @@ public class AttachmentController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER')")
+    @Operation(summary = "Download attachment by id for role user.",
+            description = "Download attachment by id for task where login user is assignee.")
     public AttachmentDownloadDto downloadAttachmentById(@PathVariable Long id) {
         User user = getUserFromContext();
         return attachmentService.downloadAttachmentById(user, id);
@@ -76,6 +89,8 @@ public class AttachmentController {
 
     @GetMapping("/manager/{id}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Download attachment by id for role manager.",
+            description = "Download attachment by id for any task.")
     public AttachmentDownloadDto downloadAttachmentByIdForManager(@PathVariable Long id) {
         return attachmentService.downloadAttachmentByIdForManager(id);
     }

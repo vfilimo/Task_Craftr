@@ -1,5 +1,7 @@
 package project.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,7 @@ import project.demo.service.TaskService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/tasks")
+@Tag(name = "Task management.", description = "Endpoints for task management.")
 public class TaskController {
     private static final int DEFAULT_PAGE = 0;
     private static final int DEFAULT_PAGE_SIZE = 5;
@@ -38,6 +41,8 @@ public class TaskController {
     @PostMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create new task for role manager.",
+            description = "Create new task.")
     public TaskDto createNewTaskForManager(@RequestBody @Valid TaskCreateDto createTaskDto) {
         return taskService.createNewTask(createTaskDto);
     }
@@ -45,6 +50,8 @@ public class TaskController {
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER')")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Create new task for role user.",
+            description = "Create new task where assignee is login user.")
     public TaskDto createNewTaskForAssignee(
             @RequestBody @Valid AssigneeTaskCreateDto assigneeTaskCreateDto) {
         User user = getUserFromContext();
@@ -53,6 +60,8 @@ public class TaskController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
+    @Operation(summary = "Find all tasks by project id for role user.",
+            description = "Find all tasks by project id where assignee is login user.")
     public List<TaskDto> retrieveTasksForProject(
             @RequestParam Long projectId,
             @PageableDefault(size = DEFAULT_PAGE_SIZE,
@@ -63,6 +72,8 @@ public class TaskController {
 
     @GetMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Find all tasks for role manager.",
+            description = "Find all tasks by project id.")
     public List<TaskDto> retrieveAllTasksForProject(
             @RequestParam Long projectId,
             @PageableDefault(size = DEFAULT_PAGE_SIZE,
@@ -72,6 +83,8 @@ public class TaskController {
 
     @GetMapping("/{taskId}")
     @PreAuthorize("hasRole('ROLE_USER')")
+    @Operation(summary = "Find task for role user.",
+            description = "Find task by id where login user is assignee.")
     public TaskDto retrieveTaskDetails(@PathVariable Long taskId) {
         User user = getUserFromContext();
         return taskService.findTaskDetails(user, taskId);
@@ -79,12 +92,16 @@ public class TaskController {
 
     @GetMapping("/manager/{taskId}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Find task for role manager.",
+            description = "Find any task by id.")
     public TaskDto retrieveAnyTaskDetails(@PathVariable Long taskId) {
         return taskService.findAnyTaskDetails(taskId);
     }
 
     @PutMapping("/{taskId}")
     @PreAuthorize("hasRole('ROLE_USER')")
+    @Operation(summary = "Update task for role manager.",
+            description = "Update task where login user is assignee by id.")
     public TaskDto updateTask(@PathVariable Long taskId, @RequestBody TaskUpdateDto taskUpdateDto) {
         User user = getUserFromContext();
         return taskService.updateTask(user, taskId, taskUpdateDto);
@@ -92,6 +109,8 @@ public class TaskController {
 
     @PutMapping("/manager/{taskId}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Update task for role manager.",
+            description = "Update any task by id.")
     public TaskDto updateTaskForManager(@PathVariable Long taskId,
                                         @RequestBody TaskUpdateDto taskUpdateDto) {
         return taskService.updateTaskForManager(taskId, taskUpdateDto);
@@ -100,6 +119,8 @@ public class TaskController {
     @DeleteMapping("/manager/{taskId}")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "Delete task for role manager.",
+            description = "Delete any task by id.")
     public void deleteTask(@PathVariable Long taskId) {
         taskService.deleteTask(taskId);
     }

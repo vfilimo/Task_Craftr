@@ -1,5 +1,7 @@
 package project.demo.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,24 +24,31 @@ import project.demo.service.LabelService;
 @RestController
 @RequestMapping("/labels")
 @RequiredArgsConstructor
+@Tag(name = "Label management.", description = "Endpoints for label management.")
 public class LabelController {
     private final LabelService labelService;
 
     @PostMapping
     @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
     @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "Save new label.",
+            description = "Save new label. Available for roles user and manager")
     public Label createNewLabel(@RequestBody @Valid LabelSaveDto labelSaveDto) {
         return labelService.saveLabel(labelSaveDto);
     }
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Find all labels.",
+            description = "Find all labels. Available for roles user and manager")
     public List<Label> getAllLabels(Pageable pageable) {
         return labelService.findAllLabels(pageable);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Update label.",
+            description = "Update label. Available for roles user and manager")
     public Label updateLabel(@PathVariable Long id,
                              @RequestBody @Valid LabelSaveDto labelSaveDto) {
         return labelService.updateLabel(id, labelSaveDto);
@@ -48,6 +57,8 @@ public class LabelController {
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @PreAuthorize("hasRole('ROLE_MANAGER')")
+    @Operation(summary = "Delete label.",
+            description = "Delete label. Available for role manager")
     public void deleteLabel(@PathVariable Long id) {
         labelService.deleteLabel(id);
     }
