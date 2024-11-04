@@ -9,9 +9,9 @@
 		<relativePath/>
 	</parent>
 	<groupId>project</groupId>
-	<artifactId>demo</artifactId>
+	<artifactId>project</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>TaskCraftr</name>
+	<name>TaskCrafter</name>
 	<description>Demo project for Spring Boot</description>
 	<url/>
 	<licenses>
