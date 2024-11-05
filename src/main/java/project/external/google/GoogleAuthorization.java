@@ -21,11 +21,10 @@ public class GoogleAuthorization {
     private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
     private static final String TOKENS_DIRECTORY_PATH = "src/main/resources/google/tokens";
     private static final List<String> SCOPES = List.of(
-            CalendarScopes.CALENDAR_EVENTS, GmailScopes.GMAIL_SEND);
+            CalendarScopes.CALENDAR_EVENTS);
     private static final String CREDENTIALS_FILE_PATH =
-            "src/main/resources/google/credentials.json";
+            "/google/credentials.json";
     private static final String ACCESS_TYPE = "offline";
-    private static final String GOOGLE_EMAIL = "gmail.com";
 
     public static Credential getCredentials(final NetHttpTransport netHttpTransport)
             throws IOException {
@@ -43,10 +42,5 @@ public class GoogleAuthorization {
                 .build();
         LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
         return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
-    }
-
-    public static boolean isGoogleEmail(String email) {
-        String[] split = email.split("@");
-        return split[1].equals(GOOGLE_EMAIL);
     }
 }
