@@ -10,7 +10,6 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.FileDataStoreFactory;
 import com.google.api.services.calendar.CalendarScopes;
-import com.google.api.services.gmail.GmailScopes;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;

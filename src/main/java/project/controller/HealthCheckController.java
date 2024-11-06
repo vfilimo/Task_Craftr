@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/health")
 @RequiredArgsConstructor
-@Tag(name = "Health Check", description = "Endpoints Health Check.")
+@Tag(name = "Health Check", description = "Endpoints  for health check.")
 public class HealthCheckController {
     private final JdbcTemplate jdbcTemplate;
+
     @GetMapping
     @Operation(summary = "Application health check controller")
     public String healthCheckStatus() {

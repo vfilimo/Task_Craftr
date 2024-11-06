@@ -3,7 +3,7 @@
 ![Project Screenshot](images/taskcrafter.png)
 
 
-## 🚀 Introduction
+## 👋 Introduction
 
 Task Crafter is a versatile application designed to help organize workflow at any stage.
 This application offers a user-friendly interface for managers, users and administrators,
@@ -85,12 +85,20 @@ ___
 
 ## ⚙️ Project Functionalities
 
+### 🩺 Health check:
+
+Available for non log in users.
+
+| HTTP Request | Endpoint  | Description                                                                     |
+|:-------------|:----------|:--------------------------------------------------------------------------------|
+| **GET**      | `/health` | Сhecks the functionality of the application and the connection to the database. |
+
 ### 🛂 User Authentication:
 
 | HTTP Request | Endpoint        | Description                                                   |
 |:-------------|:----------------|:--------------------------------------------------------------|
 | **POST**     | `/login`        | Login user. Will return a JWT token for authorizing requests. |
-| **POST**     | `/registration` | Register as new users with role "USER"                        |
+| **POST**     | `/registration` | Register as a new users with role "USER"                      |
  
 After registration, users need to log in. This is the first and most crucial step.  
 Further functionality is restricted based on user roles (user, manager and administrator).
@@ -99,16 +107,16 @@ Further functionality is restricted based on user roles (user, manager and admin
 - **Email: admin@example.com**
 - **Password: password**  
 
-**For a user with the USER role - it is necessary to register**
-**For a user with the MANAGER role - it is necessary to register and then changer role(it's available for role MANAGER)**
+**For a user with the USER role - it is necessary to register.**  
+**For a user with the MANAGER role - it is necessary to register and then changer role(it's available for role MANAGER).**
 
 ### 👤 User Management:
 
 * #### For users with the role of "user" or "manager", the following functions are available:
-| HTTP Request | Endpoint        | Description                                                        |
-|:-------------|:----------------|:-------------------------------------------------------------------|
-| **GET**      | `/users/me`     | Viewing information about user profile.                            |
-| **PUT**      | `/users/me`     | Update information in user profile.                                |
+| HTTP Request | Endpoint        | Description                      |
+|:-------------|:----------------|:---------------------------------|
+| **GET**      | `/users/me`     | View user profile information.   |
+| **PUT**      | `/users/me`     | Update user profile information. |
 
 * #### For administrators, the available functions include:
 | HTTP Request | Endpoint                    | Description                           |
@@ -118,19 +126,19 @@ Further functionality is restricted based on user roles (user, manager and admin
 ### 📊 Project Management:  
   
 * #### For users with the role of "manager", the following functions are available:
-| HTTP Request | Endpoint                        | Description                |
-|:-------------|:--------------------------------|:---------------------------|
-| **POST**     | `/projects`                     | Create new project.        |
-| **GET**      | `/projects/manager`             | Find all projects.         |
-| **GET**      | `/projects/manager/{projectId}` | Find any project by id.    |
-| **PUT**      | `/projects/{projectId}`         | Update any project by id.  |
+| HTTP Request | Endpoint                        | Description               |
+|:-------------|:--------------------------------|:--------------------------|
+| **POST**     | `/projects`                     | Create a new project.     |
+| **GET**      | `/projects/manager`             | Find all projects.        |
+| **GET**      | `/projects/manager/{projectId}` | Find any project by id.   |
+| **PUT**      | `/projects/{projectId}`         | Update any project by id. |
 
 
 * #### For users with the role of "user", the available functions include:
 
 | HTTP Request | Endpoint                 | Description                                                          |
 |:-------------|:-------------------------|:---------------------------------------------------------------------|
-| **GET**      | `/projects`              | Find all projects, which has task where login user is assignee.      |
+| **GET**      | `/projects`              | Find all projects, which has a task where login user is assignee.    |
 | **GET**      | `/projects/{projectId}`  | Find a project by id, which has a task where login user is assignee. |
 
 * #### For users with the role of "admin", the available functions include:
@@ -142,22 +150,22 @@ Further functionality is restricted based on user roles (user, manager and admin
 ### 📅 Task Management:
 
 * #### For managers, the following functions are available:
-| HTTP Request | Endpoint                               | Description                                  |
-|:-------------|:---------------------------------------|:---------------------------------------------|
-| **POST**     | `/tasks/manager`                       | Create new task, where assignee is any user. |
-| **GET**      | `/tasks/manager?projectId={projectId}` | Find all tasks by project id.                |
-| **GET**      | `/tasks/manager/{taskId}`              | Find any task by id.                         |
-| **PUT**      | `/tasks/manager/{taskId}`              | Update any task by id.                       |
-| **DELETE**   | `/tasks/manager/{taskId}`              | Delete any task by id.                       |
+| HTTP Request | Endpoint                               | Description                                    |
+|:-------------|:---------------------------------------|:-----------------------------------------------|
+| **POST**     | `/tasks/manager`                       | Create a new task, where assignee is any user. |
+| **GET**      | `/tasks/manager?projectId={projectId}` | Find all tasks by project id.                  |
+| **GET**      | `/tasks/manager/{taskId}`              | Find any task by id.                           |
+| **PUT**      | `/tasks/manager/{taskId}`              | Update any task by id.                         |
+| **DELETE**   | `/tasks/manager/{taskId}`              | Delete any task by id.                         |
 
 * #### For users, the following functions are available:
 
-| HTTP Request | Endpoint                       | Description                                                                                         |
-|:-------------|:-------------------------------|:----------------------------------------------------------------------------------------------------|
-| **POST**     | `/tasks`                       | Create new task where assignee is login user and for project where login user has at least one task |
-| **GET**      | `/tasks?projectId={projectId}` | Find all tasks where assignee is login user, by project id.                                         |
-| **GET**      | `/tasks/{taskId}`              | Find a task by id where login user is assignee.                                                     |
-| **PUT**      | `/tasks/{taskId}`              | Update a task where login user is assignee by id.                                                   |
+| HTTP Request | Endpoint                       | Description                                                                                             |
+|:-------------|:-------------------------------|:--------------------------------------------------------------------------------------------------------|
+| **POST**     | `/tasks`                       | Create a new task where assignee is login user and for a project where login user has at least one task |
+| **GET**      | `/tasks?projectId={projectId}` | Find all tasks where assignee is login user, by project id.                                             |
+| **GET**      | `/tasks/{taskId}`              | Find a task by id where login user is assignee.                                                         |
+| **PUT**      | `/tasks/{taskId}`              | Update a task where login user is assignee by id.                                                       |
 
 ### 📌 Labels Management:
 
@@ -180,62 +188,72 @@ Further functionality is restricted based on user roles (user, manager and admin
 
 * #### For managers, the following function is available:
 
-| HTTP Request | Endpoint                             | Description                     |
-|:-------------|:-------------------------------------|:--------------------------------|
-| **POST**     | `/comments/manager`                  | Save new comment for any task.  |
-| **GET**      | `comments/manager/?taskId={taskId}`  | Find all comments for any task. |
+| HTTP Request | Endpoint                             | Description                      |
+|:-------------|:-------------------------------------|:---------------------------------|
+| **POST**     | `/comments/manager`                  | Save a new comment for any task. |
+| **GET**      | `comments/manager/?taskId={taskId}`  | Find all comments for any task.  |
 
 ### ☁️ Attachment Management:
 
 * #### For managers the following functions are available:
 
-| HTTP Request | Endpoint                    | Description                             |
-|:-------------|:----------------------------|:----------------------------------------|
-| **POST**     | `/attachments/manager`      | Save new attachment for any task.       |
-| **GET**      | `/attachments/manager`      | Find all attachment for any task.       |
-| **GET**      | `/attachments/manager/{id}` | Download attachment by id for any task. |
+| HTTP Request | Endpoint                    | Description                                |
+|:-------------|:----------------------------|:-------------------------------------------|
+| **POST**     | `/attachments/manager`      | Save a new attachment for any task.        |
+| **GET**      | `/attachments/manager`      | Find all attachment for any task.          |
+| **GET**      | `/attachments/manager/{id}` | Download an attachment by id for any task. |
 
 * #### For users the following functions are available:
 
-| HTTP Request | Endpoint               | Description                                                      |
-|:-------------|:-----------------------|:-----------------------------------------------------------------|
-| **POST**     | `/attachments`         | Save new attachment for task where login user is assignee.       |
-| **GET**      | `/attachments`         | Find attachments for task where login user is assignee.          |
-| **GET**      | `/attachments/{id}`    | Download attachment by id for task where login user is assignee. |
+| HTTP Request | Endpoint               | Description                                                         |
+|:-------------|:-----------------------|:--------------------------------------------------------------------|
+| **POST**     | `/attachments`         | Save a new attachment for task where login user is assignee.        |
+| **GET**      | `/attachments`         | Find an attachments for task where login user is assignee.          |
+| **GET**      | `/attachments/{id}`    | Download an attachment by id for task where login user is assignee. |
 
 ---
 ## ⏳ Preparation before using the application
 
 ### 1. Registration on DropBox
-| # | Steps                                                                                      |
-|:--|:-------------------------------------------------------------------------------------------|
-| 1 | Registering you account on [**Dropbox**](https://www.dropbox.com/register)                 |
-| 2 | Create app in [**App Console**](https://www.dropbox.com/developers/apps)                   |
-| 3 | Generate your access token.<br> ![Project Screenshot](images/generate_access_token.png)    | 
-| 4 | Paste your token to ***src/main/resources/application.properties***                        |
+| # | Steps                                                                                   |
+|:--|:----------------------------------------------------------------------------------------|
+| 1 | Registering you account on [**Dropbox**](https://www.dropbox.com/register)              |
+| 2 | Create app in [**App Console**](https://www.dropbox.com/developers/apps)                |
+| 3 | Generate your access token.<br> ![Project Screenshot](images/generate_access_token.png) | 
+| 4 | Insert your token to ***src/main/resources/application.properties***                    |
 
 ### 2. Registration on Google
 
-| #  | Steps                                                                                       |
-|:--:|:--------------------------------------------------------------------------------------------|
-| 1  | Registering you account on [**Google**](https://www.google.com/intl/ru/account/about/)      |
-| 2  | Create app in [**App Console**](https://console.cloud.google.com/apis/library)              |
-| 3  | Move to APIs & Services - Credentials - Create Credentials - OAuth Client ID.               |
-| 4  | Choose application type - "Desktop app".                                                    |
-| 5  | Download client secret in json format.                                                      |
-| 6  | Rename this file like: "credentials.json" and past to ***src/main/resources/google/***      |
-| 7  | Create new calendar and past calendar id to ***src/main/resources/application.properties*** |
-| 8  | When you using first time this app, forward link in console and allow access.               |
+| #  | Steps                                                                                         |
+|:--:|:----------------------------------------------------------------------------------------------|
+| 1  | Registering you account on [**Google**](https://www.google.com/intl/ru/account/about/)        |
+| 2  | Create app in [**App Console**](https://console.cloud.google.com/apis/library)                |
+| 3  | Move to APIs & Services -> Credentials -> Create Credentials -> OAuth Client ID.              |
+| 4  | Choose application type - "Desktop app".                                                      |
+| 5  | Download client secret in json format.                                                        |
+| 6  | Rename this file like: "credentials.json" and insert to ***src/main/resources/google/***      |
+| 7  | Create new calendar and insert calendar id to ***src/main/resources/application.properties*** |
+| 8  | When you using first time this app, forward link in console and allow access.                 |
 
 
 ## 🐳 How to run this app using Docker
 1. Install and run [**Docker**](https://www.docker.com/products/docker-desktop/);
 2. Clone repo;
 3. Configure all the necessary fields in the .env file;
-4. Register on Dropbox and Google ⬆️;
+4. Register on Dropbox and Google [ ⬆️ ](#-preparation-before-using-the-application);
 5. Open a terminal and navigate to the root directory of the project on your machine;
 6. Build the project by the command `mvn clean install`;
-7. Run the application using Docker Compose `docker-compose up`;  
+7. Run the application using Docker Compose `docker-compose up`; 
+
+## 🚀 How to use this application
+1. Registered a new user.
+2. Log in as a an admin.
+3. Change the new user’s role to manager.
+4. If you want to use the application solely for yourself, enjoy!
+5. If using it corporately, please follow these guidelines:
+   *  When creating a new project, assign potential assignees by, for example, 
+   creating an initial task with project information.
+   * After this, assignees will be able to see the projects they have access to and create tasks for themselves.
 
 After these steps use the link:  
  *http:// localhost: SPRING_LOCAL_PORT/swagger-ui/index.html* (SPRING_LOCAL_PORT - configured in the .env file.)  
