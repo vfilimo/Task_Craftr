@@ -22,7 +22,7 @@ services:
     depends_on:
       - mysqldb
     restart: on-failure
-    image: task_craftr
+    image: task_crafter
     build: .
     env_file: ./.env
     ports:
