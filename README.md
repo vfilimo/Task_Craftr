@@ -160,12 +160,13 @@ Further functionality is restricted based on user roles (user, manager and admin
 
 * #### For users, the following functions are available:
 
-| HTTP Request | Endpoint                       | Description                                                                                             |
-|:-------------|:-------------------------------|:--------------------------------------------------------------------------------------------------------|
-| **POST**     | `/tasks`                       | Create a new task where assignee is login user and for a project where login user has at least one task |
-| **GET**      | `/tasks?projectId={projectId}` | Find all tasks where assignee is login user, by project id.                                             |
-| **GET**      | `/tasks/{taskId}`              | Find a task by id where login user is assignee.                                                         |
-| **PUT**      | `/tasks/{taskId}`              | Update a task where login user is assignee by id.                                                       |
+| HTTP Request | Endpoint                           | Description                                                                                             |
+|:-------------|:-----------------------------------|:--------------------------------------------------------------------------------------------------------|
+| **POST**     | `/tasks`                           | Create a new task where assignee is login user and for a project where login user has at least one task |
+| **GET**      | `/tasks?projectId={projectId}`     | Find all tasks where assignee is login user, by project id.                                             |
+| **GET**      | `/tasks/all?projectId={projectId}` | Find all tasks by project id that you have access to.                                                   |
+| **GET**      | `/tasks/{taskId}`                  | Find a task by id where login user is assignee.                                                         |
+| **PUT**      | `/tasks/{taskId}`                  | Update a task where login user is assignee by id.                                                       |
 
 ### 📌 Labels Management:
 
