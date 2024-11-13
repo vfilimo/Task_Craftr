@@ -1,9 +1,9 @@
 package project.mapper;
 
-import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import project.config.MapperConfig;
 import project.dto.attachment.AttachmentDto;
 import project.model.Attachment;
@@ -13,5 +13,10 @@ public interface AttachmentMapper {
     @Mapping(target = "taskName", source = "task.name")
     AttachmentDto toDto(Attachment attachment);
 
-    List<AttachmentDto> toDto(Page<Attachment> attachmentPage);
+    default Page<AttachmentDto> toDto(Page<Attachment> attachmentPage) {
+        return new PageImpl<>(
+                attachmentPage.stream().map(this::toDto).toList(),
+                attachmentPage.getPageable(),
+                attachmentPage.getTotalElements());
+    }
 }

@@ -1,6 +1,6 @@
 package project.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import project.dto.comment.CommentDto;
 import project.dto.comment.CreateCommentDto;
@@ -11,7 +11,7 @@ public interface CommentService {
 
     CommentDto createNewCommentForAssignee(User user, CreateCommentDto createCommentDto);
 
-    List<CommentDto> findCommentsForTask(Long taskId, Pageable pageable);
+    Page<CommentDto> findCommentsForTask(Long taskId, Pageable pageable);
 
-    List<CommentDto> findCommentsForAssigneeTask(User user, Long taskId, Pageable pageable);
+    Page<CommentDto> findCommentsForAssigneeTask(User user, Long taskId, Pageable pageable);
 }

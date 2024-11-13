@@ -1,18 +1,16 @@
 package project.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Connection;
-import java.util.List;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
@@ -35,6 +33,7 @@ import project.dto.label.LabelSaveDto;
 import project.model.Label;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+
 class LabelControllerTest {
     protected static MockMvc mockMvc;
     private static final String URL_TEMPLATE = "/labels";
@@ -114,12 +113,9 @@ class LabelControllerTest {
     @DisplayName("Find all labels")
     @WithMockUser(username = "manager", roles = "MANAGER")
     void getAllLabels_ReturnCorrectListLabels_Success() throws Exception {
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE))
+        mockMvc.perform(get(URL_TEMPLATE))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<Label> labels = objectMapper.readValue(result.getResponse().getContentAsString(),
-                new TypeReference<List<Label>>() {});
-        assertEquals(3, labels.size());
+                .andExpect(jsonPath("$.totalElements").value(3));
     }
 
     @Test

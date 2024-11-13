@@ -1,6 +1,5 @@
 package project.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
@@ -9,9 +8,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.services.calendar.model.Event;
 import java.sql.Connection;
@@ -51,6 +50,7 @@ class TaskControllerTest {
     private static final String URL_TEMPLATE = "/tasks";
     private static final String MANAGER_ENDPOINT = "/manager";
     private static final String SEPARATOR = "/";
+    private static final String ALL_ENDPOINT = "/all";
     @Autowired
     private ObjectMapper objectMapper;
     @MockBean
@@ -207,22 +207,17 @@ class TaskControllerTest {
         TaskDto actualTaskDto = objectMapper
                 .readValue(result.getResponse().getContentAsString(), TaskDto.class);
         assertNotNull(actualTaskDto);
-        List<String> excludeFields = List.of("id", "labelsId");
         EqualsBuilder.reflectionEquals(expectedTaskDto, actualTaskDto, "id", "labelsId");
     }
 
     @Test
-    @DisplayName("Find all task in project where logged-in user is assignee")
+    @DisplayName("Find user task in project where logged-in user is assignee")
     @WithMockCustomUser(username = "testUser", roles = "ROLE_USER", userId = 21L)
     void retrieveTasksForProject_ExistingProjectId_ReturnCorrectTask() throws Exception {
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE)
+        mockMvc.perform(get(URL_TEMPLATE)
                         .param("projectId", "1"))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<TaskDto> taskDtoList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<TaskDto>>() {});
-        assertEquals(1, taskDtoList.size());
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test
@@ -232,13 +227,10 @@ class TaskControllerTest {
     void retrieveTasksForProject_ExistingProjectIdButNotUserAssignee_ReturnEmptyList()
             throws Exception {
         Long id = 3L;
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE)
+        mockMvc.perform(get(URL_TEMPLATE)
                         .param("projectId", id.toString()))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<TaskDto> taskDtoList = objectMapper.readValue(result.getResponse()
-                .getContentAsString(), new TypeReference<List<TaskDto>>() {});
-        assertTrue(taskDtoList.isEmpty());
+                .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test
@@ -246,14 +238,10 @@ class TaskControllerTest {
     @WithMockUser(username = "manager", roles = "MANAGER")
     void retrieveAllTasksForProject_ExistingProjectId_ReturnCorrectTaskList() throws Exception {
         Long id = 3L;
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
+        mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
                         .param("projectId", id.toString()))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<TaskDto> taskDtoList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<TaskDto>>() {});
-        assertEquals(1, taskDtoList.size());
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test
@@ -261,15 +249,10 @@ class TaskControllerTest {
     @WithMockUser(username = "manager", roles = "MANAGER")
     void retrieveAllTasksForProject_NotExistingProjectId_ReturnEmptyList() throws Exception {
         Long id = 20L;
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
+        mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
                         .param("projectId", id.toString()))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<TaskDto> taskDtoList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<TaskDto>>() {});
-
-        assertTrue(taskDtoList.isEmpty());
+                .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test
@@ -339,7 +322,7 @@ class TaskControllerTest {
     @DisplayName("Find any task details with not existing id")
     @WithMockUser(username = "manager", roles = "MANAGER")
     void retrieveAnyTaskDetails_NotExistingTAskId_ThrowException() throws Exception {
-        Long taskId = 5L;
+        Long taskId = 7L;
 
         MvcResult result = mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT
                         + SEPARATOR + taskId))
@@ -452,5 +435,15 @@ class TaskControllerTest {
         mockMvc.perform(delete(URL_TEMPLATE + MANAGER_ENDPOINT + SEPARATOR + id))
                 .andExpect(status().isNoContent())
                 .andReturn();
+    }
+
+    @Test
+    @DisplayName("Find all task in project where logged-in user has access to")
+    @WithMockCustomUser(username = "testUser", roles = "ROLE_USER", userId = 21L)
+    void retrieveAllTasksForProject_ExistingProjectId_ReturnCorrectTask() throws Exception {
+        mockMvc.perform(get(URL_TEMPLATE + ALL_ENDPOINT)
+                        .param("projectId", "1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(2));
     }
 }

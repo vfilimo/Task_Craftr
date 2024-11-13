@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import project.model.Attachment;
 
 public interface AttachmentRepository extends JpaRepository<Attachment, Long> {
-    @EntityGraph(attributePaths = "task")
-    @Query("SELECT att FROM Attachment att JOIN att.task t JOIN t.assignee a "
+    @Query("SELECT att FROM Attachment att JOIN FETCH att.task t JOIN t.assignee a "
             + "WHERE t.id = :taskId AND a.id = :assigneeId")
     Page<Attachment> findAllByTaskIdAndAssigneeId(@PathVariable("taskId") Long taskId,
                                                   @PathVariable("assigneeId") Long assigneeId,

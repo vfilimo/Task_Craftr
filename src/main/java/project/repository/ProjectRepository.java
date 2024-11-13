@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import project.model.Project;
 
 public interface ProjectRepository extends JpaRepository<Project, Long> {
-    @Query("SELECT p FROM Task t "
+    @Query("SELECT DISTINCT p FROM Task t "
             + "JOIN t.assignee u JOIN t.project p WHERE u.id = :userId")
     Page<Project> findAllProjectsForUser(@Param("userId") Long userId, Pageable pageable);
 

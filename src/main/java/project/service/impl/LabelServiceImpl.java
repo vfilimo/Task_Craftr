@@ -1,7 +1,7 @@
 package project.service.impl;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.dto.label.LabelSaveDto;
@@ -24,9 +24,8 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public List<Label> findAllLabels(Pageable pageable) {
-        return labelRepository.findAll(pageable).stream()
-                .toList();
+    public Page<Label> findAllLabels(Pageable pageable) {
+        return labelRepository.findAll(pageable);
     }
 
     @Override

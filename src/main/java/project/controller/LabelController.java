@@ -3,8 +3,8 @@ package project.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -41,7 +41,7 @@ public class LabelController {
     @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_MANAGER')")
     @Operation(summary = "Find all labels.",
             description = "Find all labels. Available for roles user and manager")
-    public List<Label> getAllLabels(Pageable pageable) {
+    public Page<Label> getAllLabels(Pageable pageable) {
         return labelService.findAllLabels(pageable);
     }
 

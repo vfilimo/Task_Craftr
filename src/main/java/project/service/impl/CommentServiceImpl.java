@@ -1,8 +1,8 @@
 package project.service.impl;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import project.dto.comment.CommentDto;
@@ -43,12 +43,12 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public List<CommentDto> findCommentsForTask(Long taskId, Pageable pageable) {
+    public Page<CommentDto> findCommentsForTask(Long taskId, Pageable pageable) {
         return commentMapper.toDto(commentRepository.findCommentByTaskId(taskId, pageable));
     }
 
     @Override
-    public List<CommentDto> findCommentsForAssigneeTask(User user, Long taskId,
+    public Page<CommentDto> findCommentsForAssigneeTask(User user, Long taskId,
                                                         Pageable pageable) {
         return commentMapper.toDto(commentRepository
                 .findCommentByTaskIdAndUserId(taskId, user.getId(), pageable));

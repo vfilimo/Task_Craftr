@@ -1,6 +1,6 @@
 package project.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import project.dto.task.AssigneeTaskCreateDto;
 import project.dto.task.TaskCreateDto;
@@ -11,7 +11,9 @@ import project.model.User;
 public interface TaskService {
     TaskDto createNewTask(TaskCreateDto createTaskDto);
 
-    List<TaskDto> findTasksForProject(User user, Long projectId, Pageable pageable);
+    Page<TaskDto> findUserTasksForProject(User user, Long projectId, Pageable pageable);
+
+    Page<TaskDto> findAllTasksInUserProject(User user, Long projectId, Pageable pageable);
 
     TaskDto findTaskDetails(User user, Long taskId);
 
@@ -21,7 +23,7 @@ public interface TaskService {
 
     TaskDto createNewTaskForAssignee(User user, AssigneeTaskCreateDto assigneeTaskCreateDto);
 
-    List<TaskDto> findAllTasksForProject(Long projectId, Pageable pageable);
+    Page<TaskDto> findAllTasksForProject(Long projectId, Pageable pageable);
 
     TaskDto findAnyTaskDetails(Long taskId);
 

@@ -13,9 +13,11 @@ import project.validation.field.match.FieldMatch;
         message = "Password must match the repeat password")
 public class UserRegistrationRequestDto {
     @NotBlank
+    @Length(max = 255)
     private String username;
     @NotBlank
     @Email
+    @Length(max = 255)
     private String email;
     @NotBlank
     @Length(min = 8, max = 32)
@@ -24,7 +26,9 @@ public class UserRegistrationRequestDto {
     @Length(min = 8, max = 32)
     private String repeatPassword;
     @NotBlank
+    @Length(max = 255)
     private String firstName;
     @NotBlank
+    @Length(max = 255)
     private String lastName;
 }

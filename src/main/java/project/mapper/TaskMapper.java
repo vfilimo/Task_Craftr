@@ -8,6 +8,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import project.config.MapperConfig;
 import project.dto.task.AssigneeTaskCreateDto;
 import project.dto.task.TaskCreateDto;
@@ -31,7 +32,12 @@ public interface TaskMapper {
     @Mapping(target = "labelsId", ignore = true)
     TaskDto toDto(Task task);
 
-    List<TaskDto> toDto(Page<Task> taskPage);
+    default Page<TaskDto> toDto(Page<Task> taskPage) {
+        return new PageImpl<>(
+                taskPage.stream().map(this::toDto).toList(),
+                taskPage.getPageable(),
+                taskPage.getTotalElements());
+    }
 
     @AfterMapping
     default void setLabelsIds(@MappingTarget TaskDto taskDto, Task task) {

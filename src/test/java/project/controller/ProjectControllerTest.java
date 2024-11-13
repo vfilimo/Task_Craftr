@@ -1,6 +1,5 @@
 package project.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,13 +8,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Connection;
 import java.time.LocalDate;
-import java.util.List;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
@@ -146,15 +144,9 @@ class ProjectControllerTest {
     @DisplayName("Get all projects from db for user role manager")
     @WithMockUser(username = "manager", roles = {"MANAGER"})
     void retrieveManagerProjects_ReturnCorrectProjects() throws Exception {
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT))
+        mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT))
                 .andExpect(status().isOk())
-                .andReturn();
-
-        List<ProjectResponseDto> projectList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<ProjectResponseDto>>() {});
-        assertFalse(projectList.isEmpty());
-        assertEquals(3, projectList.size());
+                .andExpect(jsonPath("$.totalElements").value(3));
     }
 
     @Test
@@ -162,15 +154,9 @@ class ProjectControllerTest {
             + "must return only projects which has a task with assignee value - this user")
     @WithMockCustomUser(username = "testUser", roles = "ROLE_USER", userId = 21L)
     void retrieveUserProjects_ReturnCorrectProjectsForMockUser() throws Exception {
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE))
+        mockMvc.perform(get(URL_TEMPLATE))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<ProjectResponseDto> projectList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<ProjectResponseDto>>() {
-                });
-        assertFalse(projectList.isEmpty());
-        assertEquals(2, projectList.size());
+                .andExpect(jsonPath("$.totalElements").value(2));
     }
 
     @Test

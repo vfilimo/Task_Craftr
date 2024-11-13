@@ -3,10 +3,9 @@ package project.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -33,9 +32,6 @@ import project.service.TaskService;
 @RequestMapping("/tasks")
 @Tag(name = "Task management.", description = "Endpoints for task management.")
 public class TaskController {
-    private static final int DEFAULT_PAGE = 0;
-    private static final int DEFAULT_PAGE_SIZE = 5;
-    private static final String DEFAULT_SORT_PARAMETER = "id";
     private final TaskService taskService;
 
     @PostMapping("/manager")
@@ -60,24 +56,30 @@ public class TaskController {
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_USER')")
-    @Operation(summary = "Find all tasks by project id for role user.",
+    @Operation(summary = "Find all user tasks by project id for role user.",
             description = "Find all tasks by project id where assignee is login user.")
-    public List<TaskDto> retrieveTasksForProject(
-            @RequestParam Long projectId,
-            @PageableDefault(size = DEFAULT_PAGE_SIZE,
-                    page = DEFAULT_PAGE, sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
+    public Page<TaskDto> retrieveUserTasksForProject(
+            @RequestParam Long projectId, Pageable pageable) {
         User user = getUserFromContext();
-        return taskService.findTasksForProject(user, projectId, pageable);
+        return taskService.findUserTasksForProject(user, projectId, pageable);
+    }
+
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ROLE_USER')")
+    @Operation(summary = "Find all tasks by project id for role user.",
+            description = "Find all tasks by project id that you have access to.")
+    public Page<TaskDto> retrieveAllTasksInUserProject(@RequestParam Long projectId,
+                                                       Pageable pageable) {
+        User user = getUserFromContext();
+        return taskService.findAllTasksInUserProject(user, projectId, pageable);
     }
 
     @GetMapping("/manager")
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @Operation(summary = "Find all tasks for role manager.",
             description = "Find all tasks by project id.")
-    public List<TaskDto> retrieveAllTasksForProject(
-            @RequestParam Long projectId,
-            @PageableDefault(size = DEFAULT_PAGE_SIZE,
-                    page = DEFAULT_PAGE, sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
+    public Page<TaskDto> retrieveAllTasksForProject(
+            @RequestParam Long projectId, Pageable pageable) {
         return taskService.findAllTasksForProject(projectId, pageable);
     }
 

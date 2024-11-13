@@ -3,10 +3,9 @@ package project.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -30,9 +29,6 @@ import project.service.AttachmentService;
 @RequiredArgsConstructor
 @Tag(name = "Attachment management.", description = "Endpoints for attachment management.")
 public class AttachmentController {
-    private static final int DEFAULT_PAGE = 0;
-    private static final int DEFAULT_PAGE_SIZE = 5;
-    private static final String DEFAULT_SORT_PARAMETER = "id";
     private final AttachmentService attachmentService;
 
     @PostMapping
@@ -59,10 +55,8 @@ public class AttachmentController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "Get all attachments for role user.",
             description = "Get all attachments for task where login user is assignee.")
-    public List<AttachmentDto> getAttachmentsForTask(
-            @RequestParam Long taskId,
-            @PageableDefault(size = DEFAULT_PAGE_SIZE,
-                    page = DEFAULT_PAGE, sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
+    public Page<AttachmentDto> getAttachmentsForTask(
+            @RequestParam Long taskId, Pageable pageable) {
         User user = getUserFromContext();
         return attachmentService.findAttachmentsForTask(user, taskId, pageable);
     }
@@ -71,10 +65,8 @@ public class AttachmentController {
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @Operation(summary = "Get all attachments for role manager.",
             description = "Get all attachments for any task.")
-    public List<AttachmentDto> getAttachmentsForTaskForManager(
-            @RequestParam Long taskId,
-            @PageableDefault(size = DEFAULT_PAGE_SIZE,
-                    page = DEFAULT_PAGE, sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
+    public Page<AttachmentDto> getAttachmentsForTaskForManager(
+            @RequestParam Long taskId, Pageable pageable) {
         return attachmentService.findAttachmentsForTaskForManager(taskId, pageable);
     }
 

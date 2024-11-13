@@ -1,6 +1,6 @@
 package project.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import project.dto.attachment.AttachmentDownloadDto;
 import project.dto.attachment.AttachmentDto;
@@ -12,9 +12,9 @@ public interface AttachmentService {
 
     AttachmentDto saveAttachmentForManager(AttachmentSaveDto attachmentSaveDto);
 
-    List<AttachmentDto> findAttachmentsForTask(User assignee, Long taskId, Pageable pageable);
+    Page<AttachmentDto> findAttachmentsForTask(User assignee, Long taskId, Pageable pageable);
 
-    List<AttachmentDto> findAttachmentsForTaskForManager(Long taskId, Pageable pageable);
+    Page<AttachmentDto> findAttachmentsForTaskForManager(Long taskId, Pageable pageable);
 
     AttachmentDownloadDto downloadAttachmentById(User assignee, Long attachmentId);
 

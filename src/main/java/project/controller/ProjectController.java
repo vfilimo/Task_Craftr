@@ -3,10 +3,9 @@ package project.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -30,9 +29,6 @@ import project.service.ProjectService;
 @RequiredArgsConstructor
 @Tag(name = "Project management.", description = "Endpoints for project management.")
 public class ProjectController {
-    private static final int DEFAULT_PAGE = 0;
-    private static final int DEFAULT_PAGE_SIZE = 5;
-    private static final String DEFAULT_SORT_PARAMETER = "id";
     private final ProjectService projectService;
 
     @PostMapping
@@ -49,9 +45,7 @@ public class ProjectController {
     @PreAuthorize("hasRole('ROLE_MANAGER')")
     @Operation(summary = "Find all projects for role manager.",
             description = "Find all projects.")
-    public List<ProjectResponseDto> retrieveManagerProjects(
-            @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
-            sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
+    public Page<ProjectResponseDto> retrieveManagerProjects(Pageable pageable) {
         return projectService.findAllProject(pageable);
     }
 
@@ -59,9 +53,7 @@ public class ProjectController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = "Find all projects for role user.",
             description = "Find all projects which has task where login user is assignee.")
-    public List<ProjectResponseDto> retrieveUserProjects(
-            @PageableDefault(size = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE,
-                    sort = DEFAULT_SORT_PARAMETER) Pageable pageable) {
+    public Page<ProjectResponseDto> retrieveUserProjects(Pageable pageable) {
         User user = getUserFromContext();
         return projectService.findUsersProjects(user, pageable);
     }

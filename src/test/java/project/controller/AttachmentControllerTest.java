@@ -6,13 +6,12 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Path;
 import java.sql.Connection;
-import java.util.List;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
@@ -232,14 +231,10 @@ class AttachmentControllerTest {
     @WithMockCustomUser(username = "testUser", roles = "ROLE_USER", userId = 21L)
     void getAttachmentsForTask_ExistingTaskId_ReturnCorrectTaskList() throws Exception {
         Long id = 1L;
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE)
+        mockMvc.perform(get(URL_TEMPLATE)
                         .param("taskId", id.toString()))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<AttachmentDto> attachmentDtoList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<AttachmentDto>>() {});
-        assertEquals(1, attachmentDtoList.size());
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test
@@ -247,14 +242,10 @@ class AttachmentControllerTest {
     @WithMockCustomUser(username = "testUser", roles = "ROLE_USER", userId = 21L)
     void getAttachmentsForTask_ExistingTaskId_EmptyList() throws Exception {
         Long id = 3L;
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE)
+        mockMvc.perform(get(URL_TEMPLATE)
                         .param("taskId", id.toString()))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<AttachmentDto> attachmentDtoList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<AttachmentDto>>() {});
-        assertTrue(attachmentDtoList.isEmpty());
+                .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test
@@ -262,14 +253,10 @@ class AttachmentControllerTest {
     @WithMockUser(username = "manager", roles = "MANAGER")
     void getAttachmentsForTaskForManager_ExistingTaskId_ReturnCorrectTaskList() throws Exception {
         Long id = 3L;
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
+        mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
                         .param("taskId", id.toString()))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<AttachmentDto> attachmentDtoList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<AttachmentDto>>() {});
-        assertEquals(1, attachmentDtoList.size());
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test
@@ -278,14 +265,10 @@ class AttachmentControllerTest {
     void getAttachmentsForTaskForManager_NotExistingTaskId_ReturnEmptyList()
             throws Exception {
         Long id = 50L;
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
+        mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
                         .param("taskId", id.toString()))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<AttachmentDto> attachmentDtoList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<AttachmentDto>>() {});
-        assertTrue(attachmentDtoList.isEmpty());
+                .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test

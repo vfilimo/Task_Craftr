@@ -1,6 +1,6 @@
 package project.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import project.dto.project.ProjectRequestCreateDto;
 import project.dto.project.ProjectResponseDto;
@@ -9,7 +9,7 @@ import project.model.User;
 public interface ProjectService {
     ProjectResponseDto createNewProject(ProjectRequestCreateDto createProjectDto);
 
-    List<ProjectResponseDto> findUsersProjects(User user, Pageable pageable);
+    Page<ProjectResponseDto> findUsersProjects(User user, Pageable pageable);
 
     ProjectResponseDto findProjectDetails(User user, Long projectId);
 
@@ -19,5 +19,5 @@ public interface ProjectService {
 
     void deleteProject(Long projectId);
 
-    List<ProjectResponseDto> findAllProject(Pageable pageable);
+    Page<ProjectResponseDto> findAllProject(Pageable pageable);
 }

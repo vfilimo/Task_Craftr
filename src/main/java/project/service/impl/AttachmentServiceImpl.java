@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,13 +36,7 @@ public class AttachmentServiceImpl implements AttachmentService {
                     () -> new EntityNotFoundException(String.format(
                         "User with username: %s doesn't have task with id: %d",
                             user.getUsername(), attachmentSaveDto.taskId())));
-        String dropboxFiletId = fileSharingService.uploadAttachment(attachmentSaveDto.path());
-        Attachment attachment = new Attachment();
-        attachment.setDropboxFileId(dropboxFiletId);
-        attachment.setTask(task);
-        attachment.setUploadTime(LocalDateTime.now());
-        String filename = Paths.get(attachmentSaveDto.path()).getFileName().toString();
-        attachment.setFilename(filename);
+        Attachment attachment = initializeAttachment(task, attachmentSaveDto);
         return attachmentMapper.toDto(attachmentRepository.save(attachment));
     }
 
@@ -52,18 +45,12 @@ public class AttachmentServiceImpl implements AttachmentService {
         Task task = taskRepository.findTaskById(attachmentSaveDto.taskId()).orElseThrow(
                 () -> new EntityNotFoundException("Can't find task with id: "
                         + attachmentSaveDto.taskId()));
-        String dropboxFiletId = fileSharingService.uploadAttachment(attachmentSaveDto.path());
-        Attachment attachment = new Attachment();
-        attachment.setDropboxFileId(dropboxFiletId);
-        attachment.setTask(task);
-        attachment.setUploadTime(LocalDateTime.now());
-        String filename = Paths.get(attachmentSaveDto.path()).getFileName().toString();
-        attachment.setFilename(filename);
+        Attachment attachment = initializeAttachment(task, attachmentSaveDto);
         return attachmentMapper.toDto(attachmentRepository.save(attachment));
     }
 
     @Override
-    public List<AttachmentDto> findAttachmentsForTask(User user, Long taskId,
+    public Page<AttachmentDto> findAttachmentsForTask(User user, Long taskId,
                                                       Pageable pageable) {
         Page<Attachment> attachments = attachmentRepository
                 .findAllByTaskIdAndAssigneeId(taskId, user.getId(), pageable);
@@ -71,7 +58,7 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public List<AttachmentDto> findAttachmentsForTaskForManager(Long taskId, Pageable pageable) {
+    public Page<AttachmentDto> findAttachmentsForTaskForManager(Long taskId, Pageable pageable) {
         Page<Attachment> attachments = attachmentRepository
                 .findAllByTaskId(taskId, pageable);
         return attachmentMapper.toDto(attachments);
@@ -99,5 +86,16 @@ public class AttachmentServiceImpl implements AttachmentService {
         boolean isExists = Files.exists(filePath);
         return new AttachmentDownloadDto(isExists ? "DOWNLOADED" : "NOT EXISTS",
                 isExists ? filePath.toString() : "NOT EXISTS");
+    }
+
+    private Attachment initializeAttachment(Task task, AttachmentSaveDto attachmentSaveDto) {
+        String dropboxFiletId = fileSharingService.uploadAttachment(attachmentSaveDto.path());
+        Attachment attachment = new Attachment();
+        attachment.setDropboxFileId(dropboxFiletId);
+        attachment.setTask(task);
+        attachment.setUploadTime(LocalDateTime.now());
+        String filename = Paths.get(attachmentSaveDto.path()).getFileName().toString();
+        attachment.setFilename(filename);
+        return attachment;
     }
 }

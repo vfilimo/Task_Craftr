@@ -1,16 +1,14 @@
 package project.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.sql.Connection;
-import java.util.List;
 import javax.sql.DataSource;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
@@ -212,15 +210,10 @@ class CommentControllerTest {
     void getAllCommentsForTask_ExistingTaskId_ReturnCorrectList() throws Exception {
         Long taskId = 1L;
 
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE)
+        mockMvc.perform(get(URL_TEMPLATE)
                         .param("taskId", taskId.toString()))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<CommentDto> commentDtoList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<CommentDto>>() {});
-
-        assertEquals(1, commentDtoList.size());
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test
@@ -229,15 +222,10 @@ class CommentControllerTest {
     void getAllCommentsForTask_NotExistingTaskId_EmptyList() throws Exception {
         Long taskId = 3L;
 
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE)
+        mockMvc.perform(get(URL_TEMPLATE)
                         .param("taskId", taskId.toString()))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<CommentDto> commentDtoList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<CommentDto>>() {});
-
-        assertTrue(commentDtoList.isEmpty());
+                .andExpect(jsonPath("$.totalElements").value(0));
     }
 
     @Test
@@ -246,15 +234,10 @@ class CommentControllerTest {
     void getAllCommentsForAnyTask_ExistingTaskId_ReturnCorrectList() throws Exception {
         Long taskId = 2L;
 
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
+        mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
                         .param("taskId", taskId.toString()))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<CommentDto> commentDtoList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<CommentDto>>() {});
-
-        assertEquals(1, commentDtoList.size());
+                .andExpect(jsonPath("$.totalElements").value(1));
     }
 
     @Test
@@ -263,14 +246,9 @@ class CommentControllerTest {
     void getAllCommentsForAnyTask_NotExistingTaskId_EmptyList() throws Exception {
         Long taskId = 30L;
 
-        MvcResult result = mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
+        mockMvc.perform(get(URL_TEMPLATE + MANAGER_ENDPOINT)
                         .param("taskId", taskId.toString()))
                 .andExpect(status().isOk())
-                .andReturn();
-        List<CommentDto> commentDtoList = objectMapper.readValue(
-                result.getResponse().getContentAsString(),
-                new TypeReference<List<CommentDto>>() {});
-
-        assertTrue(commentDtoList.isEmpty());
+                .andExpect(jsonPath("$.totalElements").value(0));
     }
 }

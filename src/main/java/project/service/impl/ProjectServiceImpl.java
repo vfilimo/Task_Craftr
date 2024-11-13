@@ -1,6 +1,5 @@
 package project.service.impl;
 
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,7 +26,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectResponseDto> findUsersProjects(User user, Pageable pageable) {
+    public Page<ProjectResponseDto> findUsersProjects(User user, Pageable pageable) {
         Page<Project> allProjectsForUser = projectRepository
                 .findAllProjectsForUser(user.getId(), pageable);
         return projectMapper.toDto(allProjectsForUser);
@@ -66,7 +65,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<ProjectResponseDto> findAllProject(Pageable pageable) {
+    public Page<ProjectResponseDto> findAllProject(Pageable pageable) {
         return projectMapper.toDto(projectRepository.findAll(pageable));
     }
 }
