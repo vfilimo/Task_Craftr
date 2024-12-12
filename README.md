@@ -244,7 +244,11 @@ Further functionality is restricted based on user roles (user, manager and admin
 4. Register on Dropbox and Google [ ⬆️ ](#-preparation-before-using-the-application);
 5. Open a terminal and navigate to the root directory of the project on your machine;
 6. Build the project by the command `mvn clean install`;
-7. Run the application using Docker Compose `docker-compose up`; 
+7. Run the application using Docker Compose `docker-compose up`;
+
+After these steps use the link:  
+ *http:// localhost: SPRING_LOCAL_PORT/swagger-ui/index.html* (SPRING_LOCAL_PORT - configured in the .env file.)  
+For example http://localhost:8088/swagger-ui/index.html
 
 ## 🚀 How to use this application
 1. Registered a new user.
@@ -255,9 +259,5 @@ Further functionality is restricted based on user roles (user, manager and admin
    *  When creating a new project, assign potential assignees by, for example, 
    creating an initial task with project information.
    * After this, assignees will be able to see the projects they have access to and create tasks for themselves.
-
-After these steps use the link:  
- *http:// localhost: SPRING_LOCAL_PORT/swagger-ui/index.html* (SPRING_LOCAL_PORT - configured in the .env file.)  
-For example http://localhost:8088/swagger-ui/index.html
 
 Author [*Vitaliy Filimonov*](https://github.com/vfilimo)
